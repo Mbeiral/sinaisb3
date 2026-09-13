@@ -1,0 +1,1443 @@
+<!DOCTYPE html>
+<!-- saved from url=(0043)file:///C:/Users/mbeir/sinais_b3/index.html -->
+<html lang="pt-br" data-theme="dark"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SinaisB3 — Ações e Opções com Inteligência</title>
+  <script src="https://unpkg.com/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com/">
+  <link href="./SinaisB3 — Ações e Opções com Inteligência_files/css2" rel="stylesheet">
+  <style>
+    /* ── TOKENS ──────────────────────────────────────────────── */
+    :root {
+      --green:   #00c896;
+      --red:     #ff4d6d;
+      --amber:   #f5a623;
+      --blue:    #3b82f6;
+
+      /* dark */
+      --bg:      #0d1117;
+      --bg2:     #161b22;
+      --bg3:     #21262d;
+      --border:  #30363d;
+      --text:    #e6edf3;
+      --muted:   #7d8590;
+      --accent:  #00c896;
+    }
+    [data-theme="light"] {
+      --bg:      #f6f8fa;
+      --bg2:     #ffffff;
+      --bg3:     #eaeef2;
+      --border:  #d0d7de;
+      --text:    #1f2328;
+      --muted:   #656d76;
+      --accent:  #0969da;
+    }
+
+    /* ── RESET ───────────────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      font-size: 15px;
+      line-height: 1.6;
+      transition: background .2s, color .2s;
+    }
+    a { color: inherit; text-decoration: none; }
+    button { cursor: pointer; font-family: inherit; }
+
+    /* ── NAV ─────────────────────────────────────────────────── */
+    nav {
+      position: sticky; top: 0; z-index: 100;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 2rem; height: 56px;
+      background: var(--bg); border-bottom: 1px solid var(--border);
+    }
+    .logo {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 17px; font-weight: 500;
+      color: var(--accent);
+      letter-spacing: -.5px;
+    }
+    .logo span { color: var(--text); }
+    .nav-right { display: flex; align-items: center; gap: 12px; }
+    .btn-theme {
+      background: var(--bg3); border: 1px solid var(--border);
+      color: var(--muted); border-radius: 6px;
+      padding: 5px 10px; font-size: 13px;
+      transition: color .15s;
+    }
+    .btn-theme:hover { color: var(--text); }
+    .btn-nav {
+      background: var(--accent); color: #fff;
+      border: none; border-radius: 6px;
+      padding: 7px 16px; font-size: 13px; font-weight: 500;
+    }
+    [data-theme="light"] .btn-nav { color: #fff; }
+
+    /* ── HERO ────────────────────────────────────────────────── */
+    .hero {
+      max-width: 680px; margin: 0 auto;
+      padding: 80px 2rem 64px;
+      text-align: center;
+    }
+    .hero-badge {
+      display: inline-flex; align-items: center; gap: 6px;
+      background: var(--bg3); border: 1px solid var(--border);
+      border-radius: 20px; padding: 4px 12px;
+      font-size: 12px; color: var(--muted);
+      margin-bottom: 28px;
+    }
+    .hero-badge span { color: var(--green); font-weight: 500; }
+    h1 {
+      font-size: clamp(28px, 5vw, 44px);
+      font-weight: 600; line-height: 1.2;
+      letter-spacing: -.5px;
+      margin-bottom: 18px;
+    }
+    h1 em { font-style: normal; color: var(--accent); }
+    .hero p {
+      font-size: 16px; color: var(--muted);
+      max-width: 480px; margin: 0 auto 36px;
+    }
+    .hero-cta { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
+    .btn-primary {
+      background: var(--accent); color: #fff;
+      border: none; border-radius: 8px;
+      padding: 11px 24px; font-size: 14px; font-weight: 500;
+      transition: opacity .15s;
+    }
+    .btn-primary:hover { opacity: .88; }
+    .btn-secondary {
+      background: var(--bg3); color: var(--text);
+      border: 1px solid var(--border); border-radius: 8px;
+      padding: 11px 24px; font-size: 14px;
+      transition: border-color .15s;
+    }
+    .btn-secondary:hover { border-color: var(--muted); }
+
+    /* ── PREVIEW CARD ────────────────────────────────────────── */
+    .preview {
+      max-width: 860px; margin: 0 auto;
+      padding: 0 2rem 80px;
+    }
+    .preview-label {
+      font-size: 11px; color: var(--muted);
+      text-align: center; margin-bottom: 16px;
+      letter-spacing: .04em;
+    }
+    .preview-wrap {
+      background: var(--bg2); border: 1px solid var(--border);
+      border-radius: 12px; overflow: hidden;
+    }
+    .preview-bar {
+      display: flex; align-items: center; gap: 6px;
+      padding: 10px 14px; background: var(--bg3);
+      border-bottom: 1px solid var(--border);
+    }
+    .dot { width: 10px; height: 10px; border-radius: 50%; }
+
+    /* ── TABLE ───────────────────────────────────────────────── */
+    .tbl-wrap { overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    thead tr { background: var(--bg3); }
+    th {
+      padding: 9px 14px; text-align: left;
+      color: var(--muted); font-weight: 500;
+      font-size: 11px; letter-spacing: .04em;
+      border-bottom: 1px solid var(--border);
+      white-space: nowrap;
+    }
+    td {
+      padding: 10px 14px;
+      border-bottom: 1px solid var(--border);
+      white-space: nowrap;
+    }
+    tr:last-child td { border-bottom: none; }
+    tr:hover td { background: var(--bg3); }
+    .mono { font-family: 'JetBrains Mono', monospace; font-size: 12px; }
+    .pill {
+      display: inline-block;
+      padding: 2px 8px; border-radius: 4px;
+      font-size: 11px; font-weight: 500;
+    }
+    .pill-call { background: rgba(0,200,150,.15); color: var(--green); }
+    .pill-put  { background: rgba(255,77,109,.15); color: var(--red); }
+    .pill-alta { background: rgba(0,200,150,.1);  color: var(--green); }
+    .pill-baixa{ background: rgba(255,77,109,.1); color: var(--red); }
+    .score-bar {
+      display: flex; align-items: center; gap: 8px;
+    }
+    .bar-track {
+      width: 60px; height: 4px;
+      background: var(--bg3); border-radius: 2px; overflow: hidden;
+    }
+    .bar-fill { height: 100%; border-radius: 2px; }
+
+    /* ── OPCOES ──────────────────────────────────────────────── */
+    .opcoes-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0;
+      border-top: 1px solid var(--border);
+    }
+    .opcoes-col { padding: 20px; }
+    .opcoes-col:first-child { border-right: 1px solid var(--border); }
+    .opcoes-title {
+      font-size: 11px; font-weight: 500;
+      color: var(--muted); margin-bottom: 14px;
+      letter-spacing: .04em;
+    }
+    .opcao-item {
+      display: flex; flex-direction: column; gap: 4px;
+      padding: 10px 12px; border-radius: 8px;
+      background: var(--bg3); margin-bottom: 8px;
+    }
+    .opcao-header { display: flex; justify-content: space-between; align-items: center; }
+    .opcao-ticker { font-weight: 600; font-size: 13px; }
+    .opcao-cod { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--muted); }
+    .opcao-detail {
+      display: flex; gap: 12px;
+      font-size: 11px; color: var(--muted);
+    }
+    .opcao-detail strong { color: var(--text); }
+
+    /* ── FEATURES ────────────────────────────────────────────── */
+    .section { max-width: 860px; margin: 0 auto; padding: 64px 2rem; }
+    .section-title {
+      font-size: 22px; font-weight: 600;
+      margin-bottom: 8px; letter-spacing: -.3px;
+    }
+    .section-sub { color: var(--muted); margin-bottom: 36px; font-size: 14px; }
+    .features {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 16px;
+    }
+    .feature-card {
+      background: var(--bg2); border: 1px solid var(--border);
+      border-radius: 10px; padding: 20px;
+    }
+    .feature-icon {
+      font-size: 22px; margin-bottom: 12px;
+      display: block;
+    }
+    .feature-card h3 { font-size: 14px; font-weight: 600; margin-bottom: 6px; }
+    .feature-card p { font-size: 13px; color: var(--muted); line-height: 1.5; }
+
+    /* ── PLANOS ──────────────────────────────────────────────── */
+    .plans {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px; max-width: 600px;
+      margin: 0 auto;
+    }
+    .plan-card {
+      background: var(--bg2); border: 1px solid var(--border);
+      border-radius: 12px; padding: 24px;
+    }
+    .plan-card.featured {
+      border-color: var(--accent);
+    }
+    .plan-badge {
+      font-size: 10px; font-weight: 600; letter-spacing: .06em;
+      color: var(--accent); margin-bottom: 12px; display: block;
+    }
+    .plan-name { font-size: 16px; font-weight: 600; margin-bottom: 4px; }
+    .plan-price {
+      font-size: 32px; font-weight: 600;
+      letter-spacing: -1px; margin: 12px 0 4px;
+    }
+    .plan-price sub { font-size: 14px; font-weight: 400; color: var(--muted); }
+    .plan-desc { font-size: 12px; color: var(--muted); margin-bottom: 20px; }
+    .plan-features { list-style: none; display: flex; flex-direction: column; gap: 8px; margin-bottom: 20px; }
+    .plan-features li { font-size: 13px; display: flex; gap: 8px; }
+    .plan-features li::before { content: "✓"; color: var(--green); font-weight: 600; flex-shrink: 0; }
+    .plan-features li.off { color: var(--muted); }
+    .plan-features li.off::before { content: "–"; color: var(--muted); }
+    .btn-plan {
+      width: 100%; padding: 10px;
+      border-radius: 7px; font-size: 13px; font-weight: 500;
+      border: 1px solid var(--border);
+      background: var(--bg3); color: var(--text);
+      transition: opacity .15s;
+    }
+    .btn-plan:hover { opacity: .8; }
+    .plan-card.featured .btn-plan {
+      background: var(--accent); color: #fff; border-color: var(--accent);
+    }
+
+    /* ── DASHBOARD (área logada) ─────────────────────────────── */
+    #dashboard {
+      display: none;
+      max-width: 960px; margin: 0 auto; padding: 32px 2rem 64px;
+    }
+    .dash-header {
+      display: flex; justify-content: space-between; align-items: center;
+      margin-bottom: 24px; flex-wrap: wrap; gap: 12px;
+    }
+    .dash-title { font-size: 18px; font-weight: 600; }
+    .dash-meta { font-size: 12px; color: var(--muted); }
+    .dash-date { font-family: 'JetBrains Mono', monospace; color: var(--accent); }
+    .btn-logout {
+      background: var(--bg3); border: 1px solid var(--border);
+      color: var(--muted); border-radius: 6px;
+      padding: 6px 12px; font-size: 12px;
+    }
+
+    /* ── AUTH MODAL ──────────────────────────────────────────── */
+    .modal-overlay {
+      display: none; position: fixed; inset: 0; z-index: 200;
+      background: rgba(0,0,0,.6); backdrop-filter: blur(4px);
+      align-items: center; justify-content: center;
+    }
+    .modal-overlay.open { display: flex; }
+    .modal {
+      background: var(--bg2); border: 1px solid var(--border);
+      border-radius: 14px; padding: 32px; width: 360px;
+      position: relative;
+    }
+    .modal h2 { font-size: 18px; font-weight: 600; margin-bottom: 6px; }
+    .modal p { font-size: 13px; color: var(--muted); margin-bottom: 24px; }
+    .modal-close {
+      position: absolute; top: 16px; right: 16px;
+      background: none; border: none; color: var(--muted);
+      font-size: 18px; line-height: 1;
+    }
+    .field { margin-bottom: 14px; }
+    .field label { display: block; font-size: 12px; color: var(--muted); margin-bottom: 6px; }
+    .field input {
+      width: 100%; padding: 9px 12px;
+      background: var(--bg3); border: 1px solid var(--border);
+      border-radius: 7px; color: var(--text); font-size: 14px;
+      outline: none; transition: border-color .15s;
+    }
+    .field input:focus { border-color: var(--accent); }
+    .modal-tabs { display: flex; gap: 0; margin-bottom: 24px; border-bottom: 1px solid var(--border); }
+    .mtab {
+      padding: 8px 16px; font-size: 13px; font-weight: 500;
+      background: none; border: none; color: var(--muted);
+      border-bottom: 2px solid transparent; margin-bottom: -1px;
+    }
+    .mtab.active { color: var(--text); border-bottom-color: var(--accent); }
+    .modal-error { font-size: 12px; color: var(--red); margin-top: 8px; min-height: 16px; }
+
+    /* ── FOOTER ──────────────────────────────────────────────── */
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 24px 2rem; text-align: center;
+      font-size: 12px; color: var(--muted);
+    }
+    footer strong { color: var(--text); }
+
+    /* ── RESPONSIVE ──────────────────────────────────────────── */
+    @media (max-width: 600px) {
+      .opcoes-grid { grid-template-columns: 1fr; }
+      .opcoes-col:first-child { border-right: none; border-bottom: 1px solid var(--border); }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ── NAV ────────────────────────────────────────────────────── -->
+<nav>
+  <div class="logo">Sinais<span>B3</span></div>
+  <div class="nav-right">
+    <button class="btn-theme" onclick="toggleTheme()" title="Alternar tema">☀︎ / ☾</button>
+    <button class="btn-nav" onclick="openModal()">Entrar</button>
+  </div>
+</nav>
+
+<!-- ── LANDING ────────────────────────────────────────────────── -->
+<div id="landing">
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-badge">
+      <span>●</span> Atualizado diariamente após o pregão
+    </div>
+    <h1>As melhores <em>ações e opções</em> da B3, todo dia</h1>
+    <p>Score técnico calculado com RSI, MACD e Bollinger. Sinais de CALL e PUT com código, strike, vencimento e prêmio reais.</p>
+    <div class="hero-cta">
+      <button class="btn-primary" onclick="openModal()">Começar agora</button>
+      <a href="file:///C:/Users/mbeir/sinais_b3/index.html#planos" class="btn-secondary">Ver planos</a>
+    </div>
+  </section>
+
+  <!-- PREVIEW DO DASHBOARD -->
+  <div class="preview">
+    <div class="preview-label">Prévia do painel — dados do dia</div>
+    <div class="preview-wrap">
+      <div class="preview-bar">
+        <div class="dot" style="background:#ff5f57"></div>
+        <div class="dot" style="background:#febc2e"></div>
+        <div class="dot" style="background:#28c840"></div>
+        <span style="margin-left:8px; font-size:12px; color:var(--muted); font-family:'JetBrains Mono',monospace">sinaisb3.com.br/dashboard</span>
+      </div>
+
+      <!-- Tabela preview -->
+      <div class="tbl-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Ticker</th>
+              <th>Preço</th>
+              <th>Var%</th>
+              <th>Tendência</th>
+              <th>RSI</th>
+              <th>Score</th>
+              <th>Opção</th>
+              <th>Conf.</th>
+            </tr>
+          </thead>
+          <tbody id="preview-tbody"><tr>
+      <td class="mono" style="color:var(--muted)">1</td>
+      <td style="font-weight:600">LREN3</td>
+      <td class="mono">R$ 11.33</td>
+      <td class="mono" style="color:var(--red)">-1.05%</td>
+      <td><span class="pill pill-alta">▲ Alta</span></td>
+      <td class="mono">56.0</td>
+      <td>
+        <div class="score-bar">
+          <div class="bar-track"><div class="bar-fill" style="width:50.7%;background:#f5a623"></div></div>
+          <span class="mono" style="color:#f5a623">50.7</span>
+        </div>
+      </td>
+      <td><span class="pill pill-put">PUT</span></td>
+      <td class="mono" style="color:var(--muted)">60%</td>
+    </tr><tr>
+      <td class="mono" style="color:var(--muted)">2</td>
+      <td style="font-weight:600">HAPV3</td>
+      <td class="mono">R$ 6.73</td>
+      <td class="mono" style="color:var(--red)">-8.06%</td>
+      <td><span class="pill pill-alta">▲ Alta</span></td>
+      <td class="mono">53.6</td>
+      <td>
+        <div class="score-bar">
+          <div class="bar-track"><div class="bar-fill" style="width:49.4%;background:#f5a623"></div></div>
+          <span class="mono" style="color:#f5a623">49.4</span>
+        </div>
+      </td>
+      <td><span class="pill pill-call">CALL</span></td>
+      <td class="mono" style="color:var(--muted)">75%</td>
+    </tr><tr>
+      <td class="mono" style="color:var(--muted)">3</td>
+      <td style="font-weight:600">PRIO3</td>
+      <td class="mono">R$ 64.19</td>
+      <td class="mono" style="color:var(--green)">+0.00%</td>
+      <td><span class="pill pill-alta">▲ Alta</span></td>
+      <td class="mono">54.5</td>
+      <td>
+        <div class="score-bar">
+          <div class="bar-track"><div class="bar-fill" style="width:46.5%;background:#f5a623"></div></div>
+          <span class="mono" style="color:#f5a623">46.5</span>
+        </div>
+      </td>
+      <td><span class="pill pill-call">CALL</span></td>
+      <td class="mono" style="color:var(--muted)">57%</td>
+    </tr><tr>
+      <td class="mono" style="color:var(--muted)">4</td>
+      <td style="font-weight:600">RENT3</td>
+      <td class="mono">R$ 35.80</td>
+      <td class="mono" style="color:var(--red)">-2.74%</td>
+      <td><span class="pill pill-alta">▲ Alta</span></td>
+      <td class="mono">60.0</td>
+      <td>
+        <div class="score-bar">
+          <div class="bar-track"><div class="bar-fill" style="width:41.2%;background:#f5a623"></div></div>
+          <span class="mono" style="color:#f5a623">41.2</span>
+        </div>
+      </td>
+      <td><span class="pill pill-put">PUT</span></td>
+      <td class="mono" style="color:var(--muted)">71%</td>
+    </tr><tr>
+      <td class="mono" style="color:var(--muted)">5</td>
+      <td style="font-weight:600">BBDC4</td>
+      <td class="mono">R$ 18.59</td>
+      <td class="mono" style="color:var(--green)">+0.60%</td>
+      <td><span class="pill pill-alta">▲ Alta</span></td>
+      <td class="mono">85.3</td>
+      <td>
+        <div class="score-bar">
+          <div class="bar-track"><div class="bar-fill" style="width:38.8%;background:#ff4d6d"></div></div>
+          <span class="mono" style="color:#ff4d6d">38.8</span>
+        </div>
+      </td>
+      <td><span class="pill pill-put">PUT</span></td>
+      <td class="mono" style="color:var(--muted)">62%</td>
+    </tr><tr>
+      <td class="mono" style="color:var(--muted)">6</td>
+      <td style="font-weight:600">RADL3</td>
+      <td class="mono">R$ 19.56</td>
+      <td class="mono" style="color:var(--red)">-1.01%</td>
+      <td><span class="pill pill-alta">▲ Alta</span></td>
+      <td class="mono">62.3</td>
+      <td>
+        <div class="score-bar">
+          <div class="bar-track"><div class="bar-fill" style="width:33.8%;background:#ff4d6d"></div></div>
+          <span class="mono" style="color:#ff4d6d">33.8</span>
+        </div>
+      </td>
+      <td><span class="pill pill-put">PUT</span></td>
+      <td class="mono" style="color:var(--muted)">60%</td>
+    </tr></tbody>
+        </table>
+      </div>
+
+      <!-- Sinais de opções preview -->
+      <div class="opcoes-grid">
+        <div class="opcoes-col">
+          <div class="opcoes-title">CALL — apostar em alta</div>
+          <div id="preview-calls">
+      <div class="opcao-item">
+        <div class="opcao-header">
+          <span class="opcao-ticker">HAPV3</span>
+          <span class="opcao-cod">HAPVJ670</span>
+        </div>
+        <div class="opcao-detail">
+          <span>Strike <strong>R$ 6.70</strong></span>
+          <span>Prêmio <strong>R$ 0.77</strong></span>
+          <span>Venc <strong>16/10/2026 (34d)</strong></span>
+        </div>
+      </div></div>
+        </div>
+        <div class="opcoes-col">
+          <div class="opcoes-title">PUT — apostar em queda</div>
+          <div id="preview-puts">
+      <div class="opcao-item">
+        <div class="opcao-header">
+          <span class="opcao-ticker">RENT3</span>
+          <span class="opcao-cod">RENTV362</span>
+        </div>
+        <div class="opcao-detail">
+          <span>Strike <strong>R$ 35.81</strong></span>
+          <span>Prêmio <strong>R$ 1.80</strong></span>
+          <span>Venc <strong>16/10/2026 (34d)</strong></span>
+        </div>
+      </div>
+      <div class="opcao-item">
+        <div class="opcao-header">
+          <span class="opcao-ticker">VALE3</span>
+          <span class="opcao-cod">VALEV799</span>
+        </div>
+        <div class="opcao-detail">
+          <span>Strike <strong>R$ 78.14</strong></span>
+          <span>Prêmio <strong>R$ 5.18</strong></span>
+          <span>Venc <strong>16/10/2026 (34d)</strong></span>
+        </div>
+      </div>
+      <div class="opcao-item">
+        <div class="opcao-header">
+          <span class="opcao-ticker">WEGE3</span>
+          <span class="opcao-cod">WEGEV515</span>
+        </div>
+        <div class="opcao-detail">
+          <span>Strike <strong>R$ 51.37</strong></span>
+          <span>Prêmio <strong>R$ 3.97</strong></span>
+          <span>Venc <strong>16/10/2026 (34d)</strong></span>
+        </div>
+      </div>
+      <div class="opcao-item">
+        <div class="opcao-header">
+          <span class="opcao-ticker">ABEV3</span>
+          <span class="opcao-cod">ABEVV155</span>
+        </div>
+        <div class="opcao-detail">
+          <span>Strike <strong>R$ 15.55</strong></span>
+          <span>Prêmio <strong>R$ 0.92</strong></span>
+          <span>Venc <strong>16/10/2026 (34d)</strong></span>
+        </div>
+      </div>
+      <div class="opcao-item">
+        <div class="opcao-header">
+          <span class="opcao-ticker">PETR4</span>
+          <span class="opcao-cod">PETRV49</span>
+        </div>
+        <div class="opcao-detail">
+          <span>Strike <strong>R$ 49.05</strong></span>
+          <span>Prêmio <strong>R$ 8.54</strong></span>
+          <span>Venc <strong>16/10/2026 (34d)</strong></span>
+        </div>
+      </div>
+      <div class="opcao-item">
+        <div class="opcao-header">
+          <span class="opcao-ticker">EMBR3</span>
+          <span class="opcao-cod">EMBJV870</span>
+        </div>
+        <div class="opcao-detail">
+          <span>Strike <strong>R$ 87.07</strong></span>
+          <span>Prêmio <strong>R$ 1.16</strong></span>
+          <span>Venc <strong>16/10/2026 (34d)</strong></span>
+        </div>
+      </div>
+      <div class="opcao-item">
+        <div class="opcao-header">
+          <span class="opcao-ticker">SUZB3</span>
+          <span class="opcao-cod">SUZBV478</span>
+        </div>
+        <div class="opcao-detail">
+          <span>Strike <strong>R$ 47.88</strong></span>
+          <span>Prêmio <strong>R$ 5.26</strong></span>
+          <span>Venc <strong>16/10/2026 (34d)</strong></span>
+        </div>
+      </div>
+      <div class="opcao-item">
+        <div class="opcao-header">
+          <span class="opcao-ticker">ITUB4</span>
+          <span class="opcao-cod">ITUBV431</span>
+        </div>
+        <div class="opcao-detail">
+          <span>Strike <strong>R$ 42.76</strong></span>
+          <span>Prêmio <strong>R$ 3.18</strong></span>
+          <span>Venc <strong>16/10/2026 (34d)</strong></span>
+        </div>
+      </div>
+      <div class="opcao-item">
+        <div class="opcao-header">
+          <span class="opcao-ticker">BBAS3</span>
+          <span class="opcao-cod">BBASV225</span>
+        </div>
+        <div class="opcao-detail">
+          <span>Strike <strong>R$ 22.51</strong></span>
+          <span>Prêmio <strong>R$ 1.40</strong></span>
+          <span>Venc <strong>16/10/2026 (34d)</strong></span>
+        </div>
+      </div>
+      <div class="opcao-item">
+        <div class="opcao-header">
+          <span class="opcao-ticker">EQTL3</span>
+          <span class="opcao-cod">EQTLV397</span>
+        </div>
+        <div class="opcao-detail">
+          <span>Strike <strong>R$ 39.74</strong></span>
+          <span>Prêmio <strong>R$ 1.97</strong></span>
+          <span>Venc <strong>16/10/2026 (34d)</strong></span>
+        </div>
+      </div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FEATURES -->
+  <section class="section">
+    <div class="section-title">O que você recebe</div>
+    <div class="section-sub">Análise técnica automatizada, todo dia após o fechamento da B3.</div>
+    <div class="features">
+      <div class="feature-card">
+        <span class="feature-icon">📊</span>
+        <h3>Ranking diário</h3>
+        <p>16 ações ordenadas por score técnico combinando RSI, MACD, Bollinger e volume.</p>
+      </div>
+      <div class="feature-card">
+        <span class="feature-icon">🎯</span>
+        <h3>Opções reais</h3>
+        <p>Código, strike, vencimento e prêmio das opções ATM com dados diretos da B3.</p>
+      </div>
+      <div class="feature-card">
+        <span class="feature-icon">📈</span>
+        <h3>CALL e PUT</h3>
+        <p>Sinais de compra e venda de opções com nível de confiança para cada recomendação.</p>
+      </div>
+      <div class="feature-card">
+        <span class="feature-icon">🕐</span>
+        <h3>Atualizado todo dia</h3>
+        <p>Dados processados automaticamente após as 18h com o fechamento do pregão.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- PLANOS -->
+  <section class="section" id="planos">
+    <div class="section-title">Planos</div>
+    <div class="section-sub">7 dias grátis em qualquer plano. Cancele quando quiser.</div>
+    <div style="max-width:340px; margin:0 auto">
+      <div class="plan-card featured">
+        <span class="plan-badge">ACESSO COMPLETO</span>
+        <div class="plan-name">Plano Único</div>
+        <div class="plan-price">R$16<sub>/mês</sub></div>
+        <div class="plan-desc">Tudo que você precisa para operar melhor.</div>
+        <ul class="plan-features">
+          <li>Top 16 ações do dia</li>
+          <li>Score técnico completo</li>
+          <li>Sinais de compra e venda</li>
+          <li>Sinais de opções CALL/PUT</li>
+          <li>Código, strike e prêmio</li>
+          <li>Atualização diária após o pregão</li>
+        </ul>
+        <button class="btn-plan" onclick="openModal()">Começar agora — R$16/mês</button>
+      </div>
+    </div>
+  </section>
+
+</div><!-- /landing -->
+
+
+<!-- ── DASHBOARD (área logada) ────────────────────────────────── -->
+<div id="dashboard" style="display:none">
+  <div class="dash-header">
+    <div>
+      <div class="dash-title">Painel de sinais</div>
+      <div class="dash-meta">
+        <span id="dash-user">mbeiral@gmail.com</span> ·
+        Atualizado: <span class="dash-date" id="dash-date">13/09/2026 (dados de exemplo)</span>
+      </div>
+    </div>
+    <button class="btn-logout" onclick="logout()">Sair</button>
+  </div>
+
+  <!-- Tabela -->
+  <div class="preview-wrap" style="margin-bottom:24px">
+    <div class="tbl-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Ticker</th>
+            <th>Preço</th>
+            <th>Var%</th>
+            <th>Tendência</th>
+            <th>RSI</th>
+            <th>Score</th>
+            <th>Opção</th>
+            <th>Conf.</th>
+          </tr>
+        </thead>
+        <tbody id="dash-tbody"><tr>
+      <td class="mono" style="color:var(--muted)">1</td>
+      <td style="font-weight:600">LREN3</td>
+      <td class="mono">R$ 11.33</td>
+      <td class="mono" style="color:var(--red)">-1.05%</td>
+      <td><span class="pill pill-alta">▲ Alta</span></td>
+      <td class="mono">56.0</td>
+      <td>
+        <div class="score-bar">
+          <div class="bar-track"><div class="bar-fill" style="width:50.7%;background:#f5a623"></div></div>
+          <span class="mono" style="color:#f5a623">50.7</span>
+        </div>
+      </td>
+      <td><span class="pill pill-put">PUT</span></td>
+      <td class="mono" style="color:var(--muted)">60%</td>
+    </tr><tr>
+      <td class="mono" style="color:var(--muted)">2</td>
+      <td style="font-weight:600">HAPV3</td>
+      <td class="mono">R$ 6.73</td>
+      <td class="mono" style="color:var(--red)">-8.06%</td>
+      <td><span class="pill pill-alta">▲ Alta</span></td>
+      <td class="mono">53.6</td>
+      <td>
+        <div class="score-bar">
+          <div class="bar-track"><div class="bar-fill" style="width:49.4%;background:#f5a623"></div></div>
+          <span class="mono" style="color:#f5a623">49.4</span>
+        </div>
+      </td>
+      <td><span class="pill pill-call">CALL</span></td>
+      <td class="mono" style="color:var(--muted)">75%</td>
+    </tr><tr>
+      <td class="mono" style="color:var(--muted)">3</td>
+      <td style="font-weight:600">PRIO3</td>
+      <td class="mono">R$ 64.19</td>
+      <td class="mono" style="color:var(--green)">+0.00%</td>
+      <td><span class="pill pill-alta">▲ Alta</span></td>
+      <td class="mono">54.5</td>
+      <td>
+        <div class="score-bar">
+          <div class="bar-track"><div class="bar-fill" style="width:46.5%;background:#f5a623"></div></div>
+          <span class="mono" style="color:#f5a623">46.5</span>
+        </div>
+      </td>
+      <td><span class="pill pill-call">CALL</span></td>
+      <td class="mono" style="color:var(--muted)">57%</td>
+    </tr><tr>
+      <td class="mono" style="color:var(--muted)">4</td>
+      <td style="font-weight:600">RENT3</td>
+      <td class="mono">R$ 35.80</td>
+      <td class="mono" style="color:var(--red)">-2.74%</td>
+      <td><span class="pill pill-alta">▲ Alta</span></td>
+      <td class="mono">60.0</td>
+      <td>
+        <div class="score-bar">
+          <div class="bar-track"><div class="bar-fill" style="width:41.2%;background:#f5a623"></div></div>
+          <span class="mono" style="color:#f5a623">41.2</span>
+        </div>
+      </td>
+      <td><span class="pill pill-put">PUT</span></td>
+      <td class="mono" style="color:var(--muted)">71%</td>
+    </tr><tr>
+      <td class="mono" style="color:var(--muted)">5</td>
+      <td style="font-weight:600">BBDC4</td>
+      <td class="mono">R$ 18.59</td>
+      <td class="mono" style="color:var(--green)">+0.60%</td>
+      <td><span class="pill pill-alta">▲ Alta</span></td>
+      <td class="mono">85.3</td>
+      <td>
+        <div class="score-bar">
+          <div class="bar-track"><div class="bar-fill" style="width:38.8%;background:#ff4d6d"></div></div>
+          <span class="mono" style="color:#ff4d6d">38.8</span>
+        </div>
+      </td>
+      <td><span class="pill pill-put">PUT</span></td>
+      <td class="mono" style="color:var(--muted)">62%</td>
+    </tr><tr>
+      <td class="mono" style="color:var(--muted)">6</td>
+      <td style="font-weight:600">RADL3</td>
+      <td class="mono">R$ 19.56</td>
+      <td class="mono" style="color:var(--red)">-1.01%</td>
+      <td><span class="pill pill-alta">▲ Alta</span></td>
+      <td class="mono">62.3</td>
+      <td>
+        <div class="score-bar">
+          <div class="bar-track"><div class="bar-fill" style="width:33.8%;background:#ff4d6d"></div></div>
+          <span class="mono" style="color:#ff4d6d">33.8</span>
+        </div>
+      </td>
+      <td><span class="pill pill-put">PUT</span></td>
+      <td class="mono" style="color:var(--muted)">60%</td>
+    </tr><tr>
+      <td class="mono" style="color:var(--muted)">7</td>
+      <td style="font-weight:600">VALE3</td>
+      <td class="mono">R$ 78.20</td>
+      <td class="mono" style="color:var(--red)">-0.04%</td>
+      <td><span class="pill pill-alta">▲ Alta</span></td>
+      <td class="mono">62.5</td>
+      <td>
+        <div class="score-bar">
+          <div class="bar-track"><div class="bar-fill" style="width:33.8%;background:#ff4d6d"></div></div>
+          <span class="mono" style="color:#ff4d6d">33.8</span>
+        </div>
+      </td>
+      <td><span class="pill pill-put">PUT</span></td>
+      <td class="mono" style="color:var(--muted)">75%</td>
+    </tr><tr>
+      <td class="mono" style="color:var(--muted)">8</td>
+      <td style="font-weight:600">WEGE3</td>
+      <td class="mono">R$ 51.49</td>
+      <td class="mono" style="color:var(--red)">-1.30%</td>
+      <td><span class="pill pill-alta">▲ Alta</span></td>
+      <td class="mono">63.3</td>
+      <td>
+        <div class="score-bar">
+          <div class="bar-track"><div class="bar-fill" style="width:33.3%;background:#ff4d6d"></div></div>
+          <span class="mono" style="color:#ff4d6d">33.3</span>
+        </div>
+      </td>
+      <td><span class="pill pill-put">PUT</span></td>
+      <td class="mono" style="color:var(--muted)">71%</td>
+    </tr><tr>
+      <td class="mono" style="color:var(--muted)">9</td>
+      <td style="font-weight:600">GGBR4</td>
+      <td class="mono">R$ 26.10</td>
+      <td class="mono" style="color:var(--green)">+0.35%</td>
+      <td><span class="pill pill-alta">▲ Alta</span></td>
+      <td class="mono">85.5</td>
+      <td>
+        <div class="score-bar">
+          <div class="bar-track"><div class="bar-fill" style="width:32.5%;background:#ff4d6d"></div></div>
+          <span class="mono" style="color:#ff4d6d">32.5</span>
+        </div>
+      </td>
+      <td><span class="pill pill-put">PUT</span></td>
+      <td class="mono" style="color:var(--muted)">62%</td>
+    </tr><tr>
+      <td class="mono" style="color:var(--muted)">10</td>
+      <td style="font-weight:600">ABEV3</td>
+      <td class="mono">R$ 15.62</td>
+      <td class="mono" style="color:var(--red)">-0.76%</td>
+      <td><span class="pill pill-alta">▲ Alta</span></td>
+      <td class="mono">64.9</td>
+      <td>
+        <div class="score-bar">
+          <div class="bar-track"><div class="bar-fill" style="width:26.3%;background:#ff4d6d"></div></div>
+          <span class="mono" style="color:#ff4d6d">26.3</span>
+        </div>
+      </td>
+      <td><span class="pill pill-put">PUT</span></td>
+      <td class="mono" style="color:var(--muted)">83%</td>
+    </tr><tr>
+      <td class="mono" style="color:var(--muted)">11</td>
+      <td style="font-weight:600">PETR4</td>
+      <td class="mono">R$ 49.00</td>
+      <td class="mono" style="color:var(--red)">-0.24%</td>
+      <td><span class="pill pill-alta">▲ Alta</span></td>
+      <td class="mono">68.0</td>
+      <td>
+        <div class="score-bar">
+          <div class="bar-track"><div class="bar-fill" style="width:25.5%;background:#ff4d6d"></div></div>
+          <span class="mono" style="color:#ff4d6d">25.5</span>
+        </div>
+      </td>
+      <td><span class="pill pill-put">PUT</span></td>
+      <td class="mono" style="color:var(--muted)">83%</td>
+    </tr><tr>
+      <td class="mono" style="color:var(--muted)">12</td>
+      <td style="font-weight:600">EMBR3</td>
+      <td class="mono">R$ 86.99</td>
+      <td class="mono" style="color:var(--red)">-1.02%</td>
+      <td><span class="pill pill-alta">▲ Alta</span></td>
+      <td class="mono">71.5</td>
+      <td>
+        <div class="score-bar">
+          <div class="bar-track"><div class="bar-fill" style="width:24.6%;background:#ff4d6d"></div></div>
+          <span class="mono" style="color:#ff4d6d">24.6</span>
+        </div>
+      </td>
+      <td><span class="pill pill-put">PUT</span></td>
+      <td class="mono" style="color:var(--muted)">71%</td>
+    </tr><tr>
+      <td class="mono" style="color:var(--muted)">13</td>
+      <td style="font-weight:600">SUZB3</td>
+      <td class="mono">R$ 47.81</td>
+      <td class="mono" style="color:var(--red)">-0.60%</td>
+      <td><span class="pill pill-alta">▲ Alta</span></td>
+      <td class="mono">73.7</td>
+      <td>
+        <div class="score-bar">
+          <div class="bar-track"><div class="bar-fill" style="width:24.1%;background:#ff4d6d"></div></div>
+          <span class="mono" style="color:#ff4d6d">24.1</span>
+        </div>
+      </td>
+      <td><span class="pill pill-put">PUT</span></td>
+      <td class="mono" style="color:var(--muted)">83%</td>
+    </tr><tr>
+      <td class="mono" style="color:var(--muted)">14</td>
+      <td style="font-weight:600">ITUB4</td>
+      <td class="mono">R$ 42.73</td>
+      <td class="mono" style="color:var(--green)">+0.90%</td>
+      <td><span class="pill pill-alta">▲ Alta</span></td>
+      <td class="mono">81.7</td>
+      <td>
+        <div class="score-bar">
+          <div class="bar-track"><div class="bar-fill" style="width:23.8%;background:#ff4d6d"></div></div>
+          <span class="mono" style="color:#ff4d6d">23.8</span>
+        </div>
+      </td>
+      <td><span class="pill pill-put">PUT</span></td>
+      <td class="mono" style="color:var(--muted)">83%</td>
+    </tr><tr>
+      <td class="mono" style="color:var(--muted)">15</td>
+      <td style="font-weight:600">BBAS3</td>
+      <td class="mono">R$ 22.49</td>
+      <td class="mono" style="color:var(--red)">-1.36%</td>
+      <td><span class="pill pill-alta">▲ Alta</span></td>
+      <td class="mono">86.1</td>
+      <td>
+        <div class="score-bar">
+          <div class="bar-track"><div class="bar-fill" style="width:23.8%;background:#ff4d6d"></div></div>
+          <span class="mono" style="color:#ff4d6d">23.8</span>
+        </div>
+      </td>
+      <td><span class="pill pill-put">PUT</span></td>
+      <td class="mono" style="color:var(--muted)">71%</td>
+    </tr><tr>
+      <td class="mono" style="color:var(--muted)">16</td>
+      <td style="font-weight:600">EQTL3</td>
+      <td class="mono">R$ 39.65</td>
+      <td class="mono" style="color:var(--red)">-1.12%</td>
+      <td><span class="pill pill-alta">▲ Alta</span></td>
+      <td class="mono">79.0</td>
+      <td>
+        <div class="score-bar">
+          <div class="bar-track"><div class="bar-fill" style="width:23.8%;background:#ff4d6d"></div></div>
+          <span class="mono" style="color:#ff4d6d">23.8</span>
+        </div>
+      </td>
+      <td><span class="pill pill-put">PUT</span></td>
+      <td class="mono" style="color:var(--muted)">71%</td>
+    </tr></tbody>
+      </table>
+    </div>
+
+    <div class="opcoes-grid">
+      <div class="opcoes-col">
+        <div class="opcoes-title">CALL — apostar em alta</div>
+        <div id="dash-calls">
+      <div class="opcao-item">
+        <div class="opcao-header">
+          <span class="opcao-ticker">HAPV3</span>
+          <span class="opcao-cod">HAPVJ670</span>
+        </div>
+        <div class="opcao-detail">
+          <span>Strike <strong>R$ 6.70</strong></span>
+          <span>Prêmio <strong>R$ 0.77</strong></span>
+          <span>Venc <strong>16/10/2026 (34d)</strong></span>
+        </div>
+      </div></div>
+      </div>
+      <div class="opcoes-col">
+        <div class="opcoes-title">PUT — apostar em queda</div>
+        <div id="dash-puts">
+      <div class="opcao-item">
+        <div class="opcao-header">
+          <span class="opcao-ticker">RENT3</span>
+          <span class="opcao-cod">RENTV362</span>
+        </div>
+        <div class="opcao-detail">
+          <span>Strike <strong>R$ 35.81</strong></span>
+          <span>Prêmio <strong>R$ 1.80</strong></span>
+          <span>Venc <strong>16/10/2026 (34d)</strong></span>
+        </div>
+      </div>
+      <div class="opcao-item">
+        <div class="opcao-header">
+          <span class="opcao-ticker">VALE3</span>
+          <span class="opcao-cod">VALEV799</span>
+        </div>
+        <div class="opcao-detail">
+          <span>Strike <strong>R$ 78.14</strong></span>
+          <span>Prêmio <strong>R$ 5.18</strong></span>
+          <span>Venc <strong>16/10/2026 (34d)</strong></span>
+        </div>
+      </div>
+      <div class="opcao-item">
+        <div class="opcao-header">
+          <span class="opcao-ticker">WEGE3</span>
+          <span class="opcao-cod">WEGEV515</span>
+        </div>
+        <div class="opcao-detail">
+          <span>Strike <strong>R$ 51.37</strong></span>
+          <span>Prêmio <strong>R$ 3.97</strong></span>
+          <span>Venc <strong>16/10/2026 (34d)</strong></span>
+        </div>
+      </div>
+      <div class="opcao-item">
+        <div class="opcao-header">
+          <span class="opcao-ticker">ABEV3</span>
+          <span class="opcao-cod">ABEVV155</span>
+        </div>
+        <div class="opcao-detail">
+          <span>Strike <strong>R$ 15.55</strong></span>
+          <span>Prêmio <strong>R$ 0.92</strong></span>
+          <span>Venc <strong>16/10/2026 (34d)</strong></span>
+        </div>
+      </div>
+      <div class="opcao-item">
+        <div class="opcao-header">
+          <span class="opcao-ticker">PETR4</span>
+          <span class="opcao-cod">PETRV49</span>
+        </div>
+        <div class="opcao-detail">
+          <span>Strike <strong>R$ 49.05</strong></span>
+          <span>Prêmio <strong>R$ 8.54</strong></span>
+          <span>Venc <strong>16/10/2026 (34d)</strong></span>
+        </div>
+      </div>
+      <div class="opcao-item">
+        <div class="opcao-header">
+          <span class="opcao-ticker">EMBR3</span>
+          <span class="opcao-cod">EMBJV870</span>
+        </div>
+        <div class="opcao-detail">
+          <span>Strike <strong>R$ 87.07</strong></span>
+          <span>Prêmio <strong>R$ 1.16</strong></span>
+          <span>Venc <strong>16/10/2026 (34d)</strong></span>
+        </div>
+      </div>
+      <div class="opcao-item">
+        <div class="opcao-header">
+          <span class="opcao-ticker">SUZB3</span>
+          <span class="opcao-cod">SUZBV478</span>
+        </div>
+        <div class="opcao-detail">
+          <span>Strike <strong>R$ 47.88</strong></span>
+          <span>Prêmio <strong>R$ 5.26</strong></span>
+          <span>Venc <strong>16/10/2026 (34d)</strong></span>
+        </div>
+      </div>
+      <div class="opcao-item">
+        <div class="opcao-header">
+          <span class="opcao-ticker">ITUB4</span>
+          <span class="opcao-cod">ITUBV431</span>
+        </div>
+        <div class="opcao-detail">
+          <span>Strike <strong>R$ 42.76</strong></span>
+          <span>Prêmio <strong>R$ 3.18</strong></span>
+          <span>Venc <strong>16/10/2026 (34d)</strong></span>
+        </div>
+      </div>
+      <div class="opcao-item">
+        <div class="opcao-header">
+          <span class="opcao-ticker">BBAS3</span>
+          <span class="opcao-cod">BBASV225</span>
+        </div>
+        <div class="opcao-detail">
+          <span>Strike <strong>R$ 22.51</strong></span>
+          <span>Prêmio <strong>R$ 1.40</strong></span>
+          <span>Venc <strong>16/10/2026 (34d)</strong></span>
+        </div>
+      </div>
+      <div class="opcao-item">
+        <div class="opcao-header">
+          <span class="opcao-ticker">EQTL3</span>
+          <span class="opcao-cod">EQTLV397</span>
+        </div>
+        <div class="opcao-detail">
+          <span>Strike <strong>R$ 39.74</strong></span>
+          <span>Prêmio <strong>R$ 1.97</strong></span>
+          <span>Venc <strong>16/10/2026 (34d)</strong></span>
+        </div>
+      </div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ── MODAL AUTH ──────────────────────────────────────────────── -->
+<div class="modal-overlay" id="modal">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal()">✕</button>
+    <h2>Acessar SinaisB3</h2>
+    <p>Veja os sinais do dia para ações e opções da B3.</p>
+    <div class="modal-tabs">
+      <button class="mtab active" onclick="switchTab('login')">Entrar</button>
+      <button class="mtab" onclick="switchTab('signup')">Criar conta</button>
+    </div>
+    <div id="tab-login">
+      <div class="field">
+        <label>E-mail</label>
+        <input type="email" id="login-email" placeholder="seu@email.com">
+      </div>
+      <div class="field">
+        <label>Senha</label>
+        <input type="password" id="login-pass" placeholder="••••••••">
+      </div>
+      <button class="btn-primary" style="width:100%;padding:10px" onclick="login()">Entrar</button>
+      <div class="modal-error" id="login-error"></div>
+    </div>
+    <div id="tab-signup" style="display:none">
+      <div class="field">
+        <label>Nome</label>
+        <input type="text" id="signup-name" placeholder="Seu nome">
+      </div>
+      <div class="field">
+        <label>E-mail</label>
+        <input type="email" id="signup-email" placeholder="seu@email.com">
+      </div>
+      <div class="field">
+        <label>Senha</label>
+        <input type="password" id="signup-pass" placeholder="Mínimo 6 caracteres">
+      </div>
+      <button class="btn-primary" style="width:100%;padding:10px" onclick="signup()">Criar conta grátis</button>
+      <div class="modal-error" id="signup-error"></div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ── FOOTER ──────────────────────────────────────────────────── -->
+<footer>
+  <strong>SinaisB3</strong> — Análise técnica automatizada para o mercado brasileiro.<br>
+  Os sinais são informativos e não constituem recomendação de investimento.
+</footer>
+
+
+<script>
+// ── DADOS DE EXEMPLO (substituir pela integração Supabase) ──────
+const DADOS_EXEMPLO = [
+  { rank:1,  ticker:"LREN3", preco:11.33, var:-1.05, tend:"ALTA",  rsi:56.0, score:50.7, opcao:"PUT",  conf:60 },
+  { rank:2,  ticker:"HAPV3", preco:6.73,  var:-8.06, tend:"ALTA",  rsi:53.6, score:49.4, opcao:"CALL", conf:75 },
+  { rank:3,  ticker:"PRIO3", preco:64.19, var:0.0,   tend:"ALTA",  rsi:54.5, score:46.5, opcao:"CALL", conf:57 },
+  { rank:4,  ticker:"RENT3", preco:35.80, var:-2.74, tend:"ALTA",  rsi:60.0, score:41.2, opcao:"PUT",  conf:71 },
+  { rank:5,  ticker:"BBDC4", preco:18.59, var:0.60,  tend:"ALTA",  rsi:85.3, score:38.8, opcao:"PUT",  conf:62 },
+  { rank:6,  ticker:"RADL3", preco:19.56, var:-1.01, tend:"ALTA",  rsi:62.3, score:33.8, opcao:"PUT",  conf:60 },
+  { rank:7,  ticker:"VALE3", preco:78.20, var:-0.04, tend:"ALTA",  rsi:62.5, score:33.8, opcao:"PUT",  conf:75 },
+  { rank:8,  ticker:"WEGE3", preco:51.49, var:-1.30, tend:"ALTA",  rsi:63.3, score:33.3, opcao:"PUT",  conf:71 },
+  { rank:9,  ticker:"GGBR4", preco:26.10, var:0.35,  tend:"ALTA",  rsi:85.5, score:32.5, opcao:"PUT",  conf:62 },
+  { rank:10, ticker:"ABEV3", preco:15.62, var:-0.76, tend:"ALTA",  rsi:64.9, score:26.3, opcao:"PUT",  conf:83 },
+  { rank:11, ticker:"PETR4", preco:49.00, var:-0.24, tend:"ALTA",  rsi:68.0, score:25.5, opcao:"PUT",  conf:83 },
+  { rank:12, ticker:"EMBR3", preco:86.99, var:-1.02, tend:"ALTA",  rsi:71.5, score:24.6, opcao:"PUT",  conf:71 },
+  { rank:13, ticker:"SUZB3", preco:47.81, var:-0.60, tend:"ALTA",  rsi:73.7, score:24.1, opcao:"PUT",  conf:83 },
+  { rank:14, ticker:"ITUB4", preco:42.73, var:0.90,  tend:"ALTA",  rsi:81.7, score:23.8, opcao:"PUT",  conf:83 },
+  { rank:15, ticker:"BBAS3", preco:22.49, var:-1.36, tend:"ALTA",  rsi:86.1, score:23.8, opcao:"PUT",  conf:71 },
+  { rank:16, ticker:"EQTL3", preco:39.65, var:-1.12, tend:"ALTA",  rsi:79.0, score:23.8, opcao:"PUT",  conf:71 },
+];
+
+const OPCOES_EXEMPLO = [
+  { ticker:"HAPV3", tipo:"CALL", codigo:"HAPVJ670", strike:6.70,  venc:"16/10/2026", dias:34, premio:0.77, conf:75 },
+  { ticker:"RENT3", tipo:"PUT",  codigo:"RENTV362", strike:35.81, venc:"16/10/2026", dias:34, premio:1.80, conf:71 },
+  { ticker:"VALE3", tipo:"PUT",  codigo:"VALEV799", strike:78.14, venc:"16/10/2026", dias:34, premio:5.18, conf:75 },
+  { ticker:"WEGE3", tipo:"PUT",  codigo:"WEGEV515", strike:51.37, venc:"16/10/2026", dias:34, premio:3.97, conf:71 },
+  { ticker:"ABEV3", tipo:"PUT",  codigo:"ABEVV155", strike:15.55, venc:"16/10/2026", dias:34, premio:0.92, conf:83 },
+  { ticker:"PETR4", tipo:"PUT",  codigo:"PETRV49",  strike:49.05, venc:"16/10/2026", dias:34, premio:8.54, conf:83 },
+  { ticker:"EMBR3", tipo:"PUT",  codigo:"EMBJV870", strike:87.07, venc:"16/10/2026", dias:34, premio:1.16, conf:71 },
+  { ticker:"SUZB3", tipo:"PUT",  codigo:"SUZBV478", strike:47.88, venc:"16/10/2026", dias:34, premio:5.26, conf:83 },
+  { ticker:"ITUB4", tipo:"PUT",  codigo:"ITUBV431", strike:42.76, venc:"16/10/2026", dias:34, premio:3.18, conf:83 },
+  { ticker:"BBAS3", tipo:"PUT",  codigo:"BBASV225", strike:22.51, venc:"16/10/2026", dias:34, premio:1.40, conf:71 },
+  { ticker:"EQTL3", tipo:"PUT",  codigo:"EQTLV397", strike:39.74, venc:"16/10/2026", dias:34, premio:1.97, conf:71 },
+];
+
+// ── RENDERIZAÇÃO ────────────────────────────────────────────────
+function scoreColor(s) {
+  if (s >= 60) return '#00c896';
+  if (s >= 40) return '#f5a623';
+  return '#ff4d6d';
+}
+
+function renderTabela(tbodyId, dados, limit) {
+  const tbody = document.getElementById(tbodyId);
+  if (!tbody) return;
+  const rows = limit ? dados.slice(0, limit) : dados;
+  tbody.innerHTML = rows.map(d => {
+    const varStr = d.var >= 0 ? '+' + d.var.toFixed(2) + '%' : d.var.toFixed(2) + '%';
+    const varColor = d.var >= 0 ? 'var(--green)' : 'var(--red)';
+    const tendPill = d.tend === 'ALTA'
+      ? '<span class="pill pill-alta">▲ Alta</span>'
+      : '<span class="pill pill-baixa">▼ Baixa</span>';
+    const opcPill = d.opcao === 'CALL'
+      ? '<span class="pill pill-call">CALL</span>'
+      : '<span class="pill pill-put">PUT</span>';
+    const sc = d.score;
+    const barColor = scoreColor(sc);
+    return `<tr>
+      <td class="mono" style="color:var(--muted)">${d.rank}</td>
+      <td style="font-weight:600">${d.ticker}</td>
+      <td class="mono">R$ ${d.preco.toFixed(2)}</td>
+      <td class="mono" style="color:${varColor}">${varStr}</td>
+      <td>${tendPill}</td>
+      <td class="mono">${d.rsi.toFixed(1)}</td>
+      <td>
+        <div class="score-bar">
+          <div class="bar-track"><div class="bar-fill" style="width:${sc}%;background:${barColor}"></div></div>
+          <span class="mono" style="color:${barColor}">${sc.toFixed(1)}</span>
+        </div>
+      </td>
+      <td>${opcPill}</td>
+      <td class="mono" style="color:var(--muted)">${d.conf}%</td>
+    </tr>`;
+  }).join('');
+}
+
+function renderOpcoes(callsId, putsId, opcoes) {
+  const calls = opcoes.filter(o => o.tipo === 'CALL' && o.conf > 69);
+  const puts  = opcoes.filter(o => o.tipo === 'PUT'  && o.conf > 69);
+
+  function html(list) {
+    if (!list.length) return '<div style="font-size:12px;color:var(--muted)">Nenhum sinal hoje</div>';
+    return list.map(o => `
+      <div class="opcao-item">
+        <div class="opcao-header">
+          <span class="opcao-ticker">${o.ticker}</span>
+          <span class="opcao-cod">${o.codigo}</span>
+        </div>
+        <div class="opcao-detail">
+          <span>Strike <strong>R$ ${o.strike.toFixed(2)}</strong></span>
+          <span>Prêmio <strong>R$ ${o.premio.toFixed(2)}</strong></span>
+          <span>Venc <strong>${o.venc} (${o.dias}d)</strong></span>
+        </div>
+      </div>`).join('');
+  }
+
+  document.getElementById(callsId).innerHTML = html(calls);
+  document.getElementById(putsId).innerHTML  = html(puts);
+}
+
+// Renderiza preview na landing
+renderTabela('preview-tbody', DADOS_EXEMPLO, 6);
+renderOpcoes('preview-calls', 'preview-puts', OPCOES_EXEMPLO);
+
+// ── TEMA ────────────────────────────────────────────────────────
+function toggleTheme() {
+  const h = document.documentElement;
+  h.dataset.theme = h.dataset.theme === 'dark' ? 'light' : 'dark';
+  localStorage.setItem('theme', h.dataset.theme);
+}
+const saved = localStorage.getItem('theme');
+if (saved) document.documentElement.dataset.theme = saved;
+
+// ── MODAL ────────────────────────────────────────────────────────
+function openModal()  { document.getElementById('modal').classList.add('open'); }
+function closeModal() { document.getElementById('modal').classList.remove('open'); }
+
+document.getElementById('modal').addEventListener('click', e => {
+  if (e.target === document.getElementById('modal')) closeModal();
+});
+
+function switchTab(tab) {
+  document.getElementById('tab-login').style.display  = tab === 'login'  ? '' : 'none';
+  document.getElementById('tab-signup').style.display = tab === 'signup' ? '' : 'none';
+  document.querySelectorAll('.mtab').forEach((t, i) => {
+    t.classList.toggle('active', (i === 0 && tab === 'login') || (i === 1 && tab === 'signup'));
+  });
+}
+
+// ── SUPABASE ────────────────────────────────────────────────────
+const SUPABASE_URL = "https://kbtosekiqecbuibwnjbg.supabase.co";
+const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtidG9zZWtpcWVjYnVpYnduamJnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODkxNjM5MDgsImV4cCI6MjEwNDczOTkwOH0.IEzTn_T9Dm1yRfG8eXhpPWM6M2a6Etp8m0ApUG8IXOQ";
+
+// Inicializa o Supabase — compatível com UMD e ESM
+const sb = (window.supabase || supabase).createClient(SUPABASE_URL, SUPABASE_KEY);
+
+// ── AUTH ────────────────────────────────────────────────────────
+async function login() {
+  const email = document.getElementById('login-email').value;
+  const pass  = document.getElementById('login-pass').value;
+  const err   = document.getElementById('login-error');
+
+  if (!email || !pass) { err.textContent = 'Preencha e-mail e senha.'; return; }
+
+  err.textContent = 'Entrando...';
+  console.log('Tentando login com:', email);
+
+  let data, error;
+  try {
+    const result = await sb.auth.signInWithPassword({ email, password: pass });
+    data  = result.data;
+    error = result.error;
+    console.log('Resultado login:', result);
+  } catch(e) {
+    console.error('Erro inesperado:', e);
+    err.textContent = 'Erro inesperado: ' + e.message;
+    return;
+  }
+
+  if (error) {
+    console.error('Erro auth:', error);
+    err.textContent = error.message === 'Invalid login credentials'
+      ? 'E-mail ou senha incorretos.'
+      : error.message;
+    return;
+  }
+
+  if (!data || !data.user) {
+    err.textContent = 'Erro ao obter dados do usuário. Tente novamente.';
+    return;
+  }
+
+  console.log('Login OK, usuário:', data.user.email);
+  err.textContent = '';
+  closeModal();
+  await showDashboard(data.user.email);
+}
+
+async function signup() {
+  const name  = document.getElementById('signup-name').value;
+  const email = document.getElementById('signup-email').value;
+  const pass  = document.getElementById('signup-pass').value;
+  const err   = document.getElementById('signup-error');
+
+  if (!name || !email || !pass) { err.textContent = 'Preencha todos os campos.'; return; }
+  if (pass.length < 6)          { err.textContent = 'Senha com mínimo 6 caracteres.'; return; }
+
+  err.textContent = 'Criando conta...';
+  const { data, error } = await sb.auth.signUp({
+    email,
+    password: pass,
+    options: { data: { nome: name } }
+  });
+
+  if (error) { err.textContent = error.message; return; }
+
+  // Verifica se precisa confirmar email
+  if (data.user && !data.session) {
+    err.style.color = 'var(--green)';
+    err.textContent = 'Conta criada! Verifique seu e-mail para confirmar o cadastro.';
+    return;
+  }
+
+  err.textContent = '';
+  closeModal();
+  await showDashboard(data.user.email);
+}
+
+async function logout() {
+  await sb.auth.signOut();
+  document.getElementById('dashboard').style.display = 'none';
+  document.getElementById('landing').style.display   = 'block';
+}
+
+async function showDashboard(email) {
+  document.getElementById('landing').style.display   = 'none';
+  document.getElementById('dashboard').style.display = 'block';
+  document.getElementById('dash-user').textContent   = email;
+  document.getElementById('dash-date').textContent   =
+    new Date().toLocaleDateString('pt-BR', { day:'2-digit', month:'2-digit', year:'numeric' });
+
+  // Busca sinais reais do Supabase
+  const hoje = new Date().toISOString().split('T')[0];
+  const { data: sinais, error } = await sb
+    .from('sinais')
+    .select('*')
+    .eq('data', hoje)
+    .order('score', { ascending: false });
+
+  if (error || !sinais || sinais.length === 0) {
+    // Usa dados de exemplo se não houver dados do dia
+    renderTabela('dash-tbody', DADOS_EXEMPLO);
+    renderOpcoes('dash-calls', 'dash-puts', OPCOES_EXEMPLO);
+    document.getElementById('dash-date').textContent += ' (dados de exemplo)';
+    return;
+  }
+
+  // Converte formato do Supabase para o formato do frontend
+  const dadosFormatados = sinais.map((s, i) => ({
+    rank  : i + 1,
+    ticker: s.ticker,
+    preco : s.preco || 0,
+    var   : s.variacao_dia || 0,
+    tend  : s.tendencia || 'ALTA',
+    rsi   : s.rsi || 0,
+    score : s.score || 0,
+    opcao : s.opcao_direcao || '—',
+    conf  : s.opcao_conf || 0,
+  }));
+
+  const opcoesFormatadas = sinais
+    .filter(s => s.opcao_codigo && s.opcao_codigo !== '—' && s.opcao_conf > 69)
+    .map(s => ({
+      ticker: s.ticker,
+      tipo  : s.opcao_direcao,
+      codigo: s.opcao_codigo,
+      strike: s.opcao_strike || 0,
+      venc  : s.opcao_venc   || '—',
+      dias  : s.opcao_dias   || 0,
+      premio: s.opcao_premio || 0,
+      conf  : s.opcao_conf   || 0,
+    }));
+
+  renderTabela('dash-tbody', dadosFormatados);
+  renderOpcoes('dash-calls', 'dash-puts', opcoesFormatadas);
+}
+
+// ── VERIFICA SESSÃO AO CARREGAR ──────────────────────────────────
+let _sessaoVerificada = false;
+
+sb.auth.onAuthStateChange(async (event, session) => {
+  if (event === 'SIGNED_IN' && session) {
+    document.getElementById('landing').style.display   = 'none';
+    document.getElementById('dashboard').style.display = 'block';
+    await showDashboard(session.user.email);
+  }
+  if (event === 'SIGNED_OUT') {
+    document.getElementById('dashboard').style.display = 'none';
+    document.getElementById('landing').style.display   = 'block';
+  }
+  // Marca que a verificação inicial foi feita
+  if (!_sessaoVerificada) {
+    _sessaoVerificada = true;
+    // Se não há sessão, garante que a landing está visível
+    if (!session) {
+      document.getElementById('landing').style.display   = 'block';
+      document.getElementById('dashboard').style.display = 'none';
+    }
+  }
+});
+
+// Verifica sessão existente ao carregar a página
+(async () => {
+  const { data: { session } } = await sb.auth.getSession();
+  if (session) {
+    document.getElementById('landing').style.display   = 'none';
+    document.getElementById('dashboard').style.display = 'block';
+    await showDashboard(session.user.email);
+  } else {
+    document.getElementById('landing').style.display   = 'block';
+    document.getElementById('dashboard').style.display = 'none';
+  }
+})();
+</script>
+
+
+</body></html>
