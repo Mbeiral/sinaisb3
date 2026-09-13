@@ -1,0 +1,33 @@
+name: Motor de Sinais B3
+
+on:
+  # Roda automaticamente de segunda a sexta às 23h UTC (20h Brasília)
+  schedule:
+    - cron: '0 23 * * 1-5'
+
+  # Permite rodar manualmente pelo GitHub (botão "Run workflow")
+  workflow_dispatch:
+
+jobs:
+  rodar-motor:
+    runs-on: ubuntu-latest
+    # 7GB de RAM disponível — suficiente para o COTAHIST de 70MB
+
+    steps:
+      - name: Baixar repositório
+        uses: actions/checkout@v4
+
+      - name: Configurar Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Instalar dependências
+        run: pip install -r requirements.txt
+
+      - name: Rodar motor de sinais
+        env:
+          AV_API_KEY:    ${{ secrets.AV_API_KEY }}
+          SUPABASE_URL:  ${{ secrets.SUPABASE_URL }}
+          SUPABASE_KEY:  ${{ secrets.SUPABASE_KEY }}
+        run: python runner.py
