@@ -197,7 +197,7 @@
     }
     .opcao-header { display: flex; justify-content: space-between; align-items: center; }
     .opcao-ticker { font-weight: 600; font-size: 13px; }
-    .opcao-cod { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--muted); }
+    .opcao-cod { font-family: 'JetBrains Mono', monospace; font-size: 14px; font-weight: 600; color: var(--accent); letter-spacing: .03em; }
     .opcao-detail {
       display: flex; gap: 12px;
       font-size: 11px; color: var(--muted);
@@ -383,14 +383,13 @@
           <thead>
             <tr>
               <th>#</th>
+              <th>Empresa</th>
               <th>Ticker</th>
               <th>Preço</th>
               <th>Var%</th>
               <th>Tendência</th>
-              <th>RSI</th>
-              <th>Score</th>
               <th>Opção</th>
-              <th>Conf.</th>
+              <th>Confiança</th>
             </tr>
           </thead>
           <tbody id="preview-tbody"><tr>
@@ -1176,6 +1175,8 @@ function scoreColor(s) {
   return '#ff4d6d';
 }
 
+const EMPRESAS = {"PETR4": "Petrobras", "VALE3": "Vale", "ITUB4": "Itaú", "BBDC4": "Bradesco", "BBAS3": "Banco do Brasil", "ABEV3": "Ambev", "WEGE3": "WEG", "PRIO3": "PRIO", "RADL3": "Raia Drogasil", "GGBR4": "Gerdau", "RENT3": "Localiza", "SUZB3": "Suzano", "EQTL3": "Equatorial", "HAPV3": "Hapvida", "LREN3": "Lojas Renner", "EMBR3": "Embraer"};
+
 function renderTabela(tbodyId, dados, limit) {
   const tbody = document.getElementById(tbodyId);
   if (!tbody) return;
@@ -1189,23 +1190,18 @@ function renderTabela(tbodyId, dados, limit) {
     const opcPill = d.opcao === 'CALL'
       ? '<span class="pill pill-call">CALL</span>'
       : '<span class="pill pill-put">PUT</span>';
-    const sc = d.score;
-    const barColor = scoreColor(sc);
+    const confColor = d.conf > 69 ? 'var(--green)' : 'var(--muted)';
+    const confWeight = d.conf > 69 ? '600' : '400';
+    const empresa = EMPRESAS[d.ticker] || d.ticker;
     return `<tr>
       <td class="mono" style="color:var(--muted)">${d.rank}</td>
+      <td style="color:var(--muted);font-size:12px">${empresa}</td>
       <td style="font-weight:600">${d.ticker}</td>
       <td class="mono">R$ ${d.preco.toFixed(2)}</td>
       <td class="mono" style="color:${varColor}">${varStr}</td>
       <td>${tendPill}</td>
-      <td class="mono">${d.rsi.toFixed(1)}</td>
-      <td>
-        <div class="score-bar">
-          <div class="bar-track"><div class="bar-fill" style="width:${sc}%;background:${barColor}"></div></div>
-          <span class="mono" style="color:${barColor}">${sc.toFixed(1)}</span>
-        </div>
-      </td>
       <td>${opcPill}</td>
-      <td class="mono" style="color:var(--muted)">${d.conf}%</td>
+      <td class="mono" style="color:${confColor};font-weight:${confWeight}">${d.conf}%</td>
     </tr>`;
   }).join('');
 }
@@ -1219,13 +1215,13 @@ function renderOpcoes(callsId, putsId, opcoes) {
     return list.map(o => `
       <div class="opcao-item">
         <div class="opcao-header">
-          <span class="opcao-ticker">${o.ticker}</span>
+          <span class="opcao-ticker">${o.ticker} <span style="font-size:11px;color:var(--muted);font-weight:400">${EMPRESAS[o.ticker]||''}</span></span>
           <span class="opcao-cod">${o.codigo}</span>
         </div>
         <div class="opcao-detail">
           <span>Strike <strong>R$ ${o.strike.toFixed(2)}</strong></span>
           <span>Prêmio <strong>R$ ${o.premio.toFixed(2)}</strong></span>
-          <span>Venc <strong>${o.venc} (${o.dias}d)</strong></span>
+          <span>Venc <strong>${o.venc}</strong></span>
         </div>
       </div>`).join('');
   }
