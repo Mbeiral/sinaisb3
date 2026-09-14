@@ -564,7 +564,7 @@
       </div>
       <div class="opcao-item">
         <div class="opcao-header">
-          <span class="opcao-ticker">EMBR3</span>
+          <span class="opcao-ticker">EMBJ3</span>
           <span class="opcao-cod">EMBJV870</span>
         </div>
         <div class="opcao-detail">
@@ -872,7 +872,7 @@
       <td class="mono" style="color:var(--muted)">83%</td>
     </tr><tr>
       <td class="mono" style="color:var(--muted)">12</td>
-      <td style="font-weight:600">EMBR3</td>
+      <td style="font-weight:600">EMBJ3</td>
       <td class="mono">R$ 86.99</td>
       <td class="mono" style="color:var(--red)">-1.02%</td>
       <td><span class="pill pill-alta">▲ Alta</span></td>
@@ -1025,7 +1025,7 @@
       </div>
       <div class="opcao-item">
         <div class="opcao-header">
-          <span class="opcao-ticker">EMBR3</span>
+          <span class="opcao-ticker">EMBJ3</span>
           <span class="opcao-cod">EMBJV870</span>
         </div>
         <div class="opcao-detail">
@@ -1147,7 +1147,7 @@ const DADOS_EXEMPLO = [
   { rank:9,  ticker:"GGBR4", preco:26.10, var:0.35,  tend:"ALTA",  rsi:85.5, score:32.5, opcao:"PUT",  conf:62 },
   { rank:10, ticker:"ABEV3", preco:15.62, var:-0.76, tend:"ALTA",  rsi:64.9, score:26.3, opcao:"PUT",  conf:83 },
   { rank:11, ticker:"PETR4", preco:49.00, var:-0.24, tend:"ALTA",  rsi:68.0, score:25.5, opcao:"PUT",  conf:83 },
-  { rank:12, ticker:"EMBR3", preco:86.99, var:-1.02, tend:"ALTA",  rsi:71.5, score:24.6, opcao:"PUT",  conf:71 },
+  { rank:12, ticker:"EMBJ3", preco:96.94, var:-1.02, tend:"ALTA",  rsi:71.5, score:24.6, opcao:"PUT",  conf:71 },
   { rank:13, ticker:"SUZB3", preco:47.81, var:-0.60, tend:"ALTA",  rsi:73.7, score:24.1, opcao:"PUT",  conf:83 },
   { rank:14, ticker:"ITUB4", preco:42.73, var:0.90,  tend:"ALTA",  rsi:81.7, score:23.8, opcao:"PUT",  conf:83 },
   { rank:15, ticker:"BBAS3", preco:22.49, var:-1.36, tend:"ALTA",  rsi:86.1, score:23.8, opcao:"PUT",  conf:71 },
@@ -1161,7 +1161,7 @@ const OPCOES_EXEMPLO = [
   { ticker:"WEGE3", tipo:"PUT",  codigo:"WEGEV515", strike:51.37, venc:"16/10/2026", dias:34, premio:3.97, conf:71 },
   { ticker:"ABEV3", tipo:"PUT",  codigo:"ABEVV155", strike:15.55, venc:"16/10/2026", dias:34, premio:0.92, conf:83 },
   { ticker:"PETR4", tipo:"PUT",  codigo:"PETRV49",  strike:49.05, venc:"16/10/2026", dias:34, premio:8.54, conf:83 },
-  { ticker:"EMBR3", tipo:"PUT",  codigo:"EMBJV870", strike:87.07, venc:"16/10/2026", dias:34, premio:1.16, conf:71 },
+  { ticker:"EMBJ3", tipo:"PUT",  codigo:"EMBJV965", strike:96.57, venc:"16/10/2026", dias:34, premio:3.27, conf:71 },
   { ticker:"SUZB3", tipo:"PUT",  codigo:"SUZBV478", strike:47.88, venc:"16/10/2026", dias:34, premio:5.26, conf:83 },
   { ticker:"ITUB4", tipo:"PUT",  codigo:"ITUBV431", strike:42.76, venc:"16/10/2026", dias:34, premio:3.18, conf:83 },
   { ticker:"BBAS3", tipo:"PUT",  codigo:"BBASV225", strike:22.51, venc:"16/10/2026", dias:34, premio:1.40, conf:71 },
@@ -1175,7 +1175,7 @@ function scoreColor(s) {
   return '#ff4d6d';
 }
 
-const EMPRESAS = {"PETR4": "Petrobras", "VALE3": "Vale", "ITUB4": "Itaú", "BBDC4": "Bradesco", "BBAS3": "Banco do Brasil", "ABEV3": "Ambev", "WEGE3": "WEG", "PRIO3": "PRIO", "RADL3": "Raia Drogasil", "GGBR4": "Gerdau", "RENT3": "Localiza", "SUZB3": "Suzano", "EQTL3": "Equatorial", "HAPV3": "Hapvida", "LREN3": "Lojas Renner", "EMBR3": "Embraer"};
+const EMPRESAS = {"PETR4": "Petrobras", "VALE3": "Vale", "ITUB4": "Itaú", "BBDC4": "Bradesco", "BBAS3": "Banco do Brasil", "ABEV3": "Ambev", "WEGE3": "WEG", "PRIO3": "PRIO", "RADL3": "Raia Drogasil", "GGBR4": "Gerdau", "RENT3": "Localiza", "SUZB3": "Suzano", "EQTL3": "Equatorial", "HAPV3": "Hapvida", "LREN3": "Lojas Renner", "EMBJ3": "Embraer"};
 
 function renderTabela(tbodyId, dados, limit) {
   const tbody = document.getElementById(tbodyId);

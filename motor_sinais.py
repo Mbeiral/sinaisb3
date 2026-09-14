@@ -55,8 +55,7 @@ except ImportError:
 #  CONFIGURAÇÕES — EDITE AQUI
 # ================================================================
 
-# AV_API_KEY    = "RLTAZUQ4OM5F99Y2"     # Obtenha grátis em alphavantage.co/support OLMOL6MHD8DMW4EN RLTAZUQ4OM5F99Y2
-AV_API_KEY = os.environ.get("AV_API_KEY", "RLTAZUQ4OM5F99Y2")
+AV_API_KEY    = "RLTAZUQ4OM5F99Y2"     # Obtenha grátis em alphavantage.co/support OLMOL6MHD8DMW4EN RLTAZUQ4OM5F99Y2
 # Opções: usando B3 diretamente (100% gratuito, sem API key)
 
 # Top 15 ações mais líquidas da B3
@@ -77,7 +76,7 @@ ACOES_B3 = [
     "EQTL3.SAO",    # Equatorial      — energia elétrica
     "HAPV3.SAO",    # Hapvida         — saúde
     "LREN3.SAO",    # Lojas Renner    — varejo
-    "EMBR3.SAO",    # Embraer         — aeronáutica
+    "EMBJ3.SAO",    # Embraer         — aeronáutica
 ]
 
 # Quantas ações processar (máximo 25 no plano gratuito)
@@ -332,7 +331,7 @@ _COTAHIST_LINHAS = None   # cache em memória — evita baixar 70MB várias veze
 # Alguns tickers usam prefixo diferente nas opções da B3
 # Ex: EMBR3 → opções começam com EMBJ (não EMBR)
 TICKER_PREFIXO_OPCAO = {
-    "EMBR3" : "EMBJ",   # Embraer
+    "EMBJ3" : "EMBJ",   # Embraer
     "BBAS3" : "BBAS",   # Banco do Brasil (confirmar)
 }
 
