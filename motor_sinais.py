@@ -386,9 +386,16 @@ def buscar_opcoes_b3(ticker: str, direcao: str, preco_acao: float) -> dict | Non
     if _COTAHIST_LINHAS is None:
         url = B3_COTAHIST_URL.format(aaaa=ano)
         print(f"\n    {Fore.CYAN}[Opções] Baixando COTAHIST {ano} (~70MB, só uma vez...){Style.RESET_ALL}")
-        conteudo = _baixar_zip(url)
+        conteudo = None
+        for tentativa in range(3):
+            conteudo = _baixar_zip(url)
+            if conteudo:
+                break
+            if tentativa < 2:
+                print(f"    {Fore.YELLOW}[Opções] Tentativa {tentativa+1} falhou, tentando novamente em 5s...{Style.RESET_ALL}")
+                time.sleep(5)
         if not conteudo:
-            print(f"\n    {Fore.YELLOW}[Opções] Não foi possível baixar o COTAHIST anual.{Style.RESET_ALL}")
+            print(f"\n    {Fore.YELLOW}[Opções] Não foi possível baixar o COTAHIST após 3 tentativas.{Style.RESET_ALL}")
             return None
         try:
             z = zipfile.ZipFile(io.BytesIO(conteudo))
