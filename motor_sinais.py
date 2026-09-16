@@ -444,15 +444,21 @@ def buscar_opcoes_b3(ticker: str, direcao: str, preco_acao: float) -> dict | Non
             continue
 
         # Verifica se é opção do ticker buscado
-        # Usa mapeamento especial quando o prefixo da opção difere do ticker
-        # Ex: EMBR3 → opções usam prefixo EMBJ na B3
+        # Para tickers com número no final (ex: PETR4, BBDC4), exige match
+        # exato nos 5 chars para evitar conflitos (PETR3 vs PETR4)
         codigo_opcao = linha[12:24].strip()
-        ticker_base5 = ticker_upper[:5]  # ex: PRIO3, BBDC4
-        ticker_base4 = ticker_upper[:4]  # ex: PRIO, BBDC
+        ticker_base5 = ticker_upper[:5]  # ex: PETR4, BBDC4
+        ticker_base4 = ticker_upper[:4]  # ex: PETR, BBDC
         prefixo_especial = TICKER_PREFIXO_OPCAO.get(ticker_upper, "")
 
-        match = (codigo_opcao.startswith(ticker_base5) or
-                 codigo_opcao.startswith(ticker_base4))
+        # Se o ticker termina em número, exige os 5 chars para evitar
+        # confusão entre PETR3 e PETR4, BBAS3 e BBAS, etc.
+        if ticker_upper[-1:].isdigit() and len(ticker_upper) >= 5:
+            match = codigo_opcao.startswith(ticker_base5)
+        else:
+            match = (codigo_opcao.startswith(ticker_base5) or
+                     codigo_opcao.startswith(ticker_base4))
+
         if prefixo_especial:
             match = match or codigo_opcao.startswith(prefixo_especial)
         if not match:
@@ -490,14 +496,15 @@ def buscar_opcoes_b3(ticker: str, direcao: str, preco_acao: float) -> dict | Non
             lado = "CALL" if tipo_mercado == "070" else "PUT"
 
             opcoes_encontradas.append({
-                "codigo"     : codigo_opcao,
-                "lado"       : lado,
-                "strike"     : strike,
-                "vencimento" : venc_dt.strftime("%d/%m/%Y"),
-                "venc_dt"    : venc_dt.isoformat(),
-                "dias_venc"  : dias_venc,
-                "premio"     : premio,
-                "volume"     : volume,
+                "codigo"      : codigo_opcao,
+                "lado"        : lado,
+                "strike"      : strike,
+                "vencimento"  : venc_dt.strftime("%d/%m/%Y"),
+                "venc_dt"     : venc_dt.isoformat(),
+                "dias_venc"   : dias_venc,
+                "premio"      : premio,
+                "volume"      : volume,
+                "data_pregao" : linha[2:10].strip(),
             })
         except Exception:
             continue
@@ -511,7 +518,11 @@ def buscar_opcoes_b3(ticker: str, direcao: str, preco_acao: float) -> dict | Non
 
 
 def _selecionar_atm(opcoes: list, direcao: str, preco_acao: float) -> dict | None:
-    """Filtra por direção e retorna a opção ATM com maior volume."""
+    """
+    Filtra por direção e retorna a opção ATM mais próxima do preço.
+    Para cada código de opção, usa apenas o registro mais recente (maior data de pregão)
+    para garantir que o strike e prêmio estejam atualizados.
+    """
     if not opcoes:
         return None
 
@@ -520,6 +531,14 @@ def _selecionar_atm(opcoes: list, direcao: str, preco_acao: float) -> dict | Non
         filtradas = [o for o in opcoes if o["lado"] == direcao]
     if not filtradas:
         return None
+
+    # Deduplica por código — mantém apenas o registro mais recente de cada opção
+    mais_recentes = {}
+    for o in filtradas:
+        cod = o["codigo"]
+        if cod not in mais_recentes or o.get("data_pregao", "") > mais_recentes[cod].get("data_pregao", ""):
+            mais_recentes[cod] = o
+    filtradas = list(mais_recentes.values())
 
     # Ordena pelo vencimento mais próximo (>= 30 dias) e pelo strike mais próximo do preço
     filtradas.sort(key=lambda o: (o["dias_venc"], abs(o["strike"] - preco_acao)))
