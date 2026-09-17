@@ -33,8 +33,9 @@ except ImportError:
 #  CONFIGURAÇÕES — cole suas credenciais aqui
 # ================================================================
 
-SUPABASE_URL = "https://SEU_PROJETO.supabase.co"
-SUPABASE_KEY = "SUA_SERVICE_ROLE_KEY"   # Use a service_role key (não a anon key)
+
+SUPABASE_URL = "https://kbtosekiqecbuibwnjbg.supabase.co"
+SUPABASE_KEY = "sb_secret_GJ0u7H2pHQY4vjOq3ONdQA_h2VA6dje"   # Use a service_role key (não a anon key)
                                          # Settings → API → service_role
 
 
