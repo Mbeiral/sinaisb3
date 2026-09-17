@@ -33,7 +33,6 @@ except ImportError:
 #  CONFIGURAÇÕES — cole suas credenciais aqui
 # ================================================================
 
-
 SUPABASE_URL = "https://kbtosekiqecbuibwnjbg.supabase.co"
 SUPABASE_KEY = "sb_secret_GJ0u7H2pHQY4vjOq3ONdQA_h2VA6dje"   # Use a service_role key (não a anon key)
                                          # Settings → API → service_role
@@ -88,14 +87,37 @@ def enviar_sinais(df: pd.DataFrame) -> bool:
         registros.append(registro)
 
     try:
-        # Upsert — atualiza se já existe (data + ticker), insere se não existe
-        result = client.table("sinais").upsert(
-            registros,
-            on_conflict="data,ticker"
-        ).execute()
+        # Upsert em lotes de 5 para evitar timeout e capturar erros individuais
+        total_ok = 0
+        erros = []
+        lote_size = 5
+        for i in range(0, len(registros), lote_size):
+            lote = registros[i:i+lote_size]
+            try:
+                result = client.table("sinais").upsert(
+                    lote,
+                    on_conflict="data,ticker"
+                ).execute()
+                total_ok += len(lote)
+            except Exception as e_lote:
+                erros.append(f"Lote {i//lote_size+1}: {e_lote}")
+                # Tenta inserir um por um para identificar o problemático
+                for reg in lote:
+                    try:
+                        client.table("sinais").upsert(
+                            [reg], on_conflict="data,ticker"
+                        ).execute()
+                        total_ok += 1
+                    except Exception as e_reg:
+                        erros.append(f"  {reg.get('ticker','?')}: {e_reg}")
 
-        print(f"✓ {len(registros)} sinais enviados para o Supabase ({hoje})")
-        return True
+        if erros:
+            print(f"⚠ {total_ok}/{len(registros)} sinais enviados. Erros:")
+            for e in erros:
+                print(f"  {e}")
+        else:
+            print(f"✓ {total_ok} sinais enviados para o Supabase ({hoje})")
+        return total_ok > 0
 
     except Exception as e:
         print(f"✗ Erro ao enviar sinais: {e}")

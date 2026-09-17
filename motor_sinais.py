@@ -359,6 +359,42 @@ def _ano_atual() -> int:
     return datetime.now().year
 
 
+def _vencimento_mensal(ano: int, mes: int) -> date:
+    """
+    Retorna a 3ª segunda-feira do mês — vencimento mensal padrão da B3.
+    """
+    # Primeiro dia do mês
+    primeiro = date(ano, mes, 1)
+    # Dia da semana do primeiro dia (0=segunda, 6=domingo)
+    dia_semana = primeiro.weekday()
+    # Primeira segunda-feira do mês
+    if dia_semana == 0:
+        primeira_segunda = primeiro
+    else:
+        primeira_segunda = primeiro + timedelta(days=(7 - dia_semana))
+    # Terceira segunda-feira = primeira + 14 dias
+    return primeira_segunda + timedelta(days=14)
+
+
+def _proximo_vencimento_mensal(hoje: date, min_dias: int = 7) -> date:
+    """
+    Retorna o próximo vencimento mensal (3ª segunda-feira) com pelo menos
+    min_dias de distância. Se faltam <= min_dias, pula para o mês seguinte.
+    """
+    ano, mes = hoje.year, hoje.month
+    for _ in range(12):  # tenta até 12 meses à frente
+        venc = _vencimento_mensal(ano, mes)
+        if (venc - hoje).days > min_dias:
+            return venc
+        # Avança para o próximo mês
+        if mes == 12:
+            ano += 1
+            mes = 1
+        else:
+            mes += 1
+    return _vencimento_mensal(ano, mes)
+
+
 def buscar_opcoes_b3(ticker: str, direcao: str, preco_acao: float) -> dict | None:
     """
     Busca a opção ATM (mais próxima do dinheiro) para o ticker,
@@ -475,8 +511,19 @@ def buscar_opcoes_b3(ticker: str, direcao: str, preco_acao: float) -> dict | Non
                 int(vencimento_str[6:8])
             )
             dias_venc = (venc_dt - hoje).days
-            if dias_venc < 30:
+            if dias_venc < 0:
                 continue
+
+            # Filtra apenas vencimentos MENSAIS (3ª segunda-feira do mês)
+            # Ignora vencimentos semanais (ex: W1, W2, W3, W4 no código)
+            venc_mensal_esperado = _vencimento_mensal(venc_dt.year, venc_dt.month)
+            if venc_dt != venc_mensal_esperado:
+                continue  # é semanal — ignora
+
+            # Exige vencimento mínimo conforme próximo mensal
+            prox_mensal = _proximo_vencimento_mensal(hoje, min_dias=7)
+            if venc_dt < prox_mensal:
+                continue  # vencimento passado ou muito próximo
 
             # Strike (posição 188:201, 2 decimais implícitos)
             strike_str = linha[188:201].strip()
