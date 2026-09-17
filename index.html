@@ -1381,17 +1381,29 @@ async function showDashboard(email) {
   }));
 
   const opcoesFormatadas = sinais
-    .filter(s => s.opcao_codigo && s.opcao_codigo !== '—' && s.opcao_conf > 69)
+    .filter(s =>
+      s.opcao_codigo &&
+      s.opcao_codigo !== '—' &&
+      s.opcao_codigo !== null &&
+      s.opcao_conf > 69 &&
+      s.opcao_strike > 0
+    )
     .map(s => ({
       ticker: s.ticker,
-      tipo  : s.opcao_direcao,
-      codigo: s.opcao_codigo,
-      strike: s.opcao_strike || 0,
-      venc  : s.opcao_venc   || '—',
-      dias  : s.opcao_dias   || 0,
-      premio: s.opcao_premio || 0,
-      conf  : s.opcao_conf   || 0,
+      tipo  : s.opcao_direcao || 'PUT',
+      codigo: s.opcao_codigo  || '—',
+      strike: parseFloat(s.opcao_strike) || 0,
+      venc  : s.opcao_venc    || '—',
+      dias  : parseInt(s.opcao_dias) || 0,
+      premio: parseFloat(s.opcao_premio) || 0,
+      conf  : parseInt(s.opcao_conf) || 0,
     }));
+
+  // Debug — mostra no console quantas opções foram encontradas
+  console.log('Sinais totais:', sinais.length);
+  console.log('Opcoes formatadas:', opcoesFormatadas.length);
+  console.log('Opcoes acima 69%:', sinais.filter(s => s.opcao_conf > 69).length);
+  console.log('Opcoes com codigo:', sinais.filter(s => s.opcao_codigo && s.opcao_codigo !== '—').length);
 
   renderTabela('dash-tbody', dadosFormatados);
   renderOpcoes('dash-calls', 'dash-puts', opcoesFormatadas);
