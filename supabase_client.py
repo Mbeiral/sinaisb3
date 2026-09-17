@@ -33,13 +33,9 @@ except ImportError:
 #  CONFIGURAÇÕES — cole suas credenciais aqui
 # ================================================================
 
-# SUPABASE_URL = "https://kbtosekiqecbuibwnjbg.supabase.co"
-# SUPABASE_KEY = "sb_secret_GJ0u7H2pHQY4vjOq3ONdQA_h2VA6dje"   # Use a service_role key (não a anon key)
+SUPABASE_URL = "https://SEU_PROJETO.supabase.co"
+SUPABASE_KEY = "SUA_SERVICE_ROLE_KEY"   # Use a service_role key (não a anon key)
                                          # Settings → API → service_role
-
-import os
-SUPABASE_URL = os.environ.get("https://kbtosekiqecbuibwnjbg.supabase.co", "")
-SUPABASE_KEY = os.environ.get("sb_secret_GJ0u7H2pHQY4vjOq3ONdQA_h2VA6dje", "")
 
 
 # ================================================================
@@ -74,7 +70,7 @@ def enviar_sinais(df: pd.DataFrame) -> bool:
         "data", "ticker", "preco", "variacao_dia", "tendencia",
         "rsi", "macd_hist", "bb_posicao", "vol_variacao", "score",
         "opcao_direcao", "opcao_conf", "opcao_codigo",
-        "opcao_strike", "opcao_venc", "opcao_premio",
+        "opcao_strike", "opcao_venc", "opcao_premio", "opcao_dias",
     ]
 
     registros = []
