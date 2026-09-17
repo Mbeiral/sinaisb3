@@ -55,7 +55,7 @@ except ImportError:
 #  CONFIGURAÇÕES — EDITE AQUI
 # ================================================================
 
-AV_API_KEY    = "OLMOL6MHD8DMW4EN"     # Obtenha grátis em alphavantage.co/support OLMOL6MHD8DMW4EN RLTAZUQ4OM5F99Y2
+AV_API_KEY    = "RLTAZUQ4OM5F99Y2"     # Obtenha grátis em alphavantage.co/support OLMOL6MHD8DMW4EN RLTAZUQ4OM5F99Y2
 # Opções: usando B3 diretamente (100% gratuito, sem API key)
 
 # Top 15 ações mais líquidas da B3
