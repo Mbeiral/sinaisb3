@@ -558,6 +558,18 @@ def buscar_opcoes_b3(ticker: str, direcao: str, preco_acao: float) -> dict | Non
         with open(cache_file, "w") as f:
             json.dump(opcoes_encontradas, f)
 
+    # Log diagnóstico
+    if not opcoes_encontradas:
+        print(f"    [Diagnóstico] Nenhuma opção {direcao} encontrada para {ticker} "
+              f"com vencimento mensal >= {_proximo_vencimento_mensal(hoje, min_dias=7)}")
+    else:
+        print(f"    [Diagnóstico] {len(opcoes_encontradas)} opções {direcao} encontradas "
+              f"para {ticker} — selecionando ATM (preço: {preco_acao})")
+        # Mostra as 3 mais próximas do ATM
+        candidatas = sorted(opcoes_encontradas, key=lambda o: abs(o["strike"] - preco_acao))[:3]
+        for c in candidatas:
+            print(f"      {c['codigo']} strike={c['strike']} venc={c['vencimento']} vol={c['volume']}")
+
     return _selecionar_atm(opcoes_encontradas, direcao, preco_acao)
 
 

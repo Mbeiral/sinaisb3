@@ -165,8 +165,9 @@
     }
     .pill-call { background: rgba(0,200,150,.15); color: var(--green); }
     .pill-put  { background: rgba(255,77,109,.15); color: var(--red); }
-    .pill-alta { background: rgba(0,200,150,.1);  color: var(--green); }
-    .pill-baixa{ background: rgba(255,77,109,.1); color: var(--red); }
+    .pill-alta    { background: rgba(0,200,150,.1);  color: var(--green); }
+    .pill-baixa   { background: rgba(255,77,109,.1); color: var(--red); }
+    .pill-neutral { background: rgba(245,166,35,.15); color: var(--amber); }
     .score-bar {
       display: flex; align-items: center; gap: 8px;
     }
@@ -1189,7 +1190,9 @@ function renderTabela(tbodyId, dados, limit) {
       : '<span class="pill pill-baixa">▼ Baixa</span>';
     const opcPill = d.opcao === 'CALL'
       ? '<span class="pill pill-call">CALL</span>'
-      : '<span class="pill pill-put">PUT</span>';
+      : d.opcao === 'PUT'
+      ? '<span class="pill pill-put">PUT</span>'
+      : '<span class="pill pill-neutral">NEUTRO</span>';
     const confColor = d.conf > 69 ? 'var(--green)' : 'var(--muted)';
     const confWeight = d.conf > 69 ? '600' : '400';
     const empresa = EMPRESAS[d.ticker] || d.ticker;
