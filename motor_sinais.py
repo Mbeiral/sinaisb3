@@ -361,19 +361,16 @@ def _ano_atual() -> int:
 
 def _vencimento_mensal(ano: int, mes: int) -> date:
     """
-    Retorna a 3ª segunda-feira do mês — vencimento mensal padrão da B3.
+    Retorna a 3ª sexta-feira do mês — vencimento mensal padrão da B3
+    para opções sobre ações.
     """
-    # Primeiro dia do mês
     primeiro = date(ano, mes, 1)
-    # Dia da semana do primeiro dia (0=segunda, 6=domingo)
-    dia_semana = primeiro.weekday()
-    # Primeira segunda-feira do mês
-    if dia_semana == 0:
-        primeira_segunda = primeiro
-    else:
-        primeira_segunda = primeiro + timedelta(days=(7 - dia_semana))
-    # Terceira segunda-feira = primeira + 14 dias
-    return primeira_segunda + timedelta(days=14)
+    dia_semana = primeiro.weekday()  # 0=seg, 4=sex
+    # Dias até a primeira sexta-feira
+    dias_ate_sexta = (4 - dia_semana) % 7
+    primeira_sexta = primeiro + timedelta(days=dias_ate_sexta)
+    # Terceira sexta-feira = primeira + 14 dias
+    return primeira_sexta + timedelta(days=14)
 
 
 def _proximo_vencimento_mensal(hoje: date, min_dias: int = 7) -> date:
