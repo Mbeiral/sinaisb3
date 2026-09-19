@@ -45,6 +45,17 @@ def main():
         motor.AV_API_KEY    = av_key
         motor.USAR_CACHE    = False   # No servidor não usa cache local
 
+        # IMPORTANTE: injeta as credenciais do Supabase ANTES de chamar
+        # gerar_ranking(), pois o motor agora também LÊ do Supabase durante
+        # a geração do ranking (fechamentos anteriores confiáveis), não só
+        # no envio final. Se isso rodar depois de gerar_ranking(), a
+        # consulta de leitura usa a chave antiga hardcoded no arquivo
+        # (não registrada) em vez da chave real vinda do GitHub Secret.
+        sys.path.insert(0, os.path.join(os.path.dirname(__file__), "supabase"))
+        import supabase_client as sb_client
+        sb_client.SUPABASE_URL = sb_url
+        sb_client.SUPABASE_KEY = sb_key
+
         log.info("Gerando ranking...")
         ranking = motor.gerar_ranking()
 
@@ -56,13 +67,7 @@ def main():
 
         # Envia para o Supabase
         log.info("Enviando para o Supabase...")
-        sys.path.insert(0, os.path.join(os.path.dirname(__file__), "supabase"))
         from supabase_client import enviar_sinais
-
-        # Sobrescreve credenciais com variáveis de ambiente
-        import supabase_client as sb_client
-        sb_client.SUPABASE_URL = sb_url
-        sb_client.SUPABASE_KEY = sb_key
 
         sucesso = enviar_sinais(ranking)
         if sucesso:
