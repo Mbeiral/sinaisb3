@@ -30,6 +30,7 @@ import numpy as np
 from datetime import datetime
 import time
 import os
+import sys
 import json
 import warnings
 
@@ -601,7 +602,7 @@ def _selecionar_atm(opcoes: list, direcao: str, preco_acao: float) -> dict | Non
 #  PROCESSAR AÇÃO
 # ================================================================
 
-def processar_acao(ticker: str) -> dict | None:
+def processar_acao(ticker: str, fechamentos_anteriores: dict | None = None) -> dict | None:
     df = baixar_dados_av(ticker)
     if df.empty:
         return None
@@ -615,18 +616,39 @@ def processar_acao(ticker: str) -> dict | None:
     bb_sup, bb_med, bb_inf, bb_pos   = calc_bollinger(closes)
     vol                              = calc_volume(volumes)
 
+    # Ticker limpo para exibição e para consultar o histórico no Supabase
+    ticker_limpo = ticker.replace(".SAO", "").replace(".SA", "")
+
     preco_atual  = round(float(closes.iloc[-1]), 2)
-    preco_ant    = round(float(closes.iloc[-2]), 2)
+    data_atual_str = closes.index[-1].strftime("%d/%m/%Y")
+
+    # ── PREÇO ANTERIOR ──────────────────────────────────────────
+    # A Alpha Vantage às vezes retorna o fechamento anterior errado para
+    # ações da B3 (confirmado: TIME_SERIES_DAILY e GLOBAL_QUOTE trazem o
+    # mesmo valor incorreto). Como o motor já salva o preço de fechamento
+    # de cada dia no Supabase, usamos esse histórico próprio como fonte
+    # confiável do "preço anterior" — só caímos para a Alpha Vantage se
+    # não houver registro anterior salvo (ex: primeira execução do ticker).
+    preco_ant_av = round(float(closes.iloc[-2]), 2)
+    registro_anterior = (fechamentos_anteriores or {}).get(ticker_limpo)
+
+    if registro_anterior:
+        preco_ant   = registro_anterior["preco"]
+        fonte_ant   = f"Supabase ({registro_anterior['data']})"
+    else:
+        preco_ant   = preco_ant_av
+        fonte_ant   = f"Alpha Vantage ({closes.index[-2].strftime('%d/%m/%Y')}, sem histórico no Supabase)"
+
     variacao_dia = round(((preco_atual / preco_ant) - 1) * 100, 2)
 
-    # Diagnóstico: mostra quais datas de pregão a Alpha Vantage retornou
-    # como "último" e "penúltimo" fechamento — ajuda a identificar quando
-    # a AV está atrasada para algum ticker específico (dado desatualizado
-    # faz a variação % não bater com o Profit ou outra fonte em tempo real)
-    data_atual_str = closes.index[-1].strftime("%d/%m/%Y")
-    data_ant_str   = closes.index[-2].strftime("%d/%m/%Y")
-    print(f"\n    [Diagnóstico Var%] {data_ant_str} (R$ {preco_ant}) → "
+    # Diagnóstico: mostra a origem do preço anterior usado no cálculo,
+    # e alerta quando ele diverge do valor bruto da Alpha Vantage
+    print(f"\n    [Diagnóstico Var%] anterior: R$ {preco_ant} [{fonte_ant}] → "
           f"{data_atual_str} (R$ {preco_atual}) = {variacao_dia}%")
+    if registro_anterior and abs(preco_ant - preco_ant_av) > 0.01:
+        print(f"    {Fore.YELLOW}[Alerta] Alpha Vantage reportou R$ {preco_ant_av} para o "
+              f"fechamento anterior — divergente do Supabase (R$ {preco_ant}). "
+              f"Usando o valor do Supabase.{Style.RESET_ALL}")
 
     score = calcular_score_compra(
         rsi, macd_h, macd_h_ant, bb_pos, vol["variacao"]
@@ -637,9 +659,6 @@ def processar_acao(ticker: str) -> dict | None:
 
     mm9  = float(closes.rolling(9).mean().iloc[-1])
     mm21 = float(closes.rolling(21).mean().iloc[-1])
-
-    # Ticker limpo para exibição (remove .SAO)
-    ticker_limpo = ticker.replace(".SAO", "").replace(".SA", "")
 
     # Busca opção ATM nos arquivos públicos da B3 (100% gratuito)
     # Só busca para sinais com confiança >= 60%
@@ -693,6 +712,23 @@ def gerar_ranking() -> pd.DataFrame:
     resultados = []
     acoes = ACOES_B3[:MAX_ACOES]
 
+    # ── Fechamentos anteriores confiáveis (Supabase) ────────────────
+    # Busca o último preço de fechamento salvo de cada ticker antes de
+    # confiar no "preço anterior" que a Alpha Vantage retorna (que já
+    # apresentou dados incorretos para ações da B3 — ver diagnóstico).
+    fechamentos_anteriores = {}
+    try:
+        sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "supabase"))
+        from supabase_client import buscar_ultimos_fechamentos
+        tickers_limpos = [t.replace(".SAO", "") for t in acoes]
+        fechamentos_anteriores = buscar_ultimos_fechamentos(tickers_limpos)
+        print(f"{Fore.CYAN}[Supabase] {len(fechamentos_anteriores)}/{len(tickers_limpos)} "
+              f"fechamentos anteriores carregados do histórico próprio{Style.RESET_ALL}\n")
+    except Exception as e:
+        print(f"{Fore.YELLOW}⚠ Não foi possível carregar fechamentos anteriores do Supabase: {e}")
+        print(f"  A variação do dia vai usar o dado bruto da Alpha Vantage "
+              f"(pode ocasionalmente estar incorreto).{Style.RESET_ALL}\n")
+
     for i, ticker in enumerate(acoes, 1):
         ticker_limpo = ticker.replace(".SAO", "")
         print(f"  [{i:02d}/{len(acoes)}] {ticker_limpo:<10}", end=" ", flush=True)
@@ -700,7 +736,7 @@ def gerar_ranking() -> pd.DataFrame:
         # Verifica se vai usar cache ou fazer requisição
         usa_cache = USAR_CACHE and os.path.exists(cache_path(ticker))
 
-        dado = processar_acao(ticker)
+        dado = processar_acao(ticker, fechamentos_anteriores)
 
         if dado:
             resultados.append(dado)

@@ -17,7 +17,7 @@ CONFIGURAÇÃO:
 import os
 import sys
 import pandas as pd
-from datetime import datetime
+from datetime import datetime, timedelta
 
 # Adiciona o diretório pai ao path para importar o motor
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -122,6 +122,58 @@ def enviar_sinais(df: pd.DataFrame) -> bool:
     except Exception as e:
         print(f"✗ Erro ao enviar sinais: {e}")
         return False
+
+
+# ================================================================
+#  BUSCAR FECHAMENTOS ANTERIORES (fonte confiável de "preço anterior")
+# ================================================================
+
+def buscar_ultimos_fechamentos(tickers: list, dias_lookback: int = 10) -> dict:
+    """
+    Busca, para cada ticker, o último preço de fechamento salvo no
+    Supabase em uma data anterior a hoje.
+
+    Usado pelo motor como fonte confiável de "preço anterior" para
+    calcular a variação do dia — a Alpha Vantage já demonstrou retornar
+    o fechamento anterior incorreto para algumas ações da B3 (mesmo erro
+    reproduzido em TIME_SERIES_DAILY e GLOBAL_QUOTE). Como o motor grava
+    o preço de cada dia processado, essa é a própria fonte da verdade
+    a partir do segundo dia de execução em diante.
+
+    Retorna: { "TICKER": {"preco": float, "data": "AAAA-MM-DD"} }
+    Tickers sem nenhum registro anterior simplesmente não aparecem no
+    dict — o chamador deve tratar esse caso (ex: cair para a AV).
+    """
+    if not tickers:
+        return {}
+
+    client        = get_client()
+    hoje          = datetime.now().strftime("%Y-%m-%d")
+    data_limite   = (datetime.now() - timedelta(days=dias_lookback)).strftime("%Y-%m-%d")
+
+    try:
+        result = (
+            client.table("sinais")
+            .select("ticker, data, preco")
+            .in_("ticker", [t.upper() for t in tickers])
+            .gte("data", data_limite)
+            .lt("data", hoje)
+            .order("data", desc=True)
+            .execute()
+        )
+    except Exception as e:
+        print(f"⚠ Erro ao buscar fechamentos anteriores no Supabase: {e}")
+        return {}
+
+    fechamentos = {}
+    for row in result.data or []:
+        ticker = row["ticker"]
+        # Como já veio ordenado por data decrescente, a primeira
+        # ocorrência de cada ticker é o fechamento mais recente
+        if ticker not in fechamentos and row.get("preco") is not None:
+            fechamentos[ticker] = {"preco": float(row["preco"]), "data": row["data"]}
+
+    return fechamentos
 
 
 # ================================================================
