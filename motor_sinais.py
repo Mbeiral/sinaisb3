@@ -56,6 +56,7 @@ except ImportError:
 # ================================================================
 
 AV_API_KEY    = "RLTAZUQ4OM5F99Y2"     # Obtenha grátis em alphavantage.co/support OLMOL6MHD8DMW4EN RLTAZUQ4OM5F99Y2
+# AV_API_KEY    = "OLMOL6MHD8DMW4EN"     # Obtenha grátis em alphavantage.co/support OLMOL6MHD8DMW4EN RLTAZUQ4OM5F99Y2
 # Opções: usando B3 diretamente (100% gratuito, sem API key)
 
 # Top 15 ações mais líquidas da B3
@@ -375,8 +376,9 @@ def _vencimento_mensal(ano: int, mes: int) -> date:
 
 def _proximo_vencimento_mensal(hoje: date, min_dias: int = 7) -> date:
     """
-    Retorna o próximo vencimento mensal (3ª segunda-feira) com pelo menos
-    min_dias de distância. Se faltam <= min_dias, pula para o mês seguinte.
+    Retorna o próximo vencimento mensal (3ª sexta-feira, regra vigente da
+    B3 desde maio/2023) com pelo menos min_dias de distância. Se faltam
+    <= min_dias, pula para o mês seguinte.
     """
     ano, mes = hoje.year, hoje.month
     for _ in range(12):  # tenta até 12 meses à frente
@@ -480,20 +482,16 @@ def buscar_opcoes_b3(ticker: str, direcao: str, preco_acao: float) -> dict | Non
         # Para tickers com número no final (ex: PETR4, BBDC4), exige match
         # exato nos 5 chars para evitar conflitos (PETR3 vs PETR4)
         codigo_opcao = linha[12:24].strip()
-        ticker_base5 = ticker_upper[:5]  # ex: PETR4, BBDC4
-        ticker_base4 = ticker_upper[:4]  # ex: PETR, BBDC
+        ticker_base4 = ticker_upper[:4]  # raiz real das opções na B3 (ex: PETR, ABEV, BBDC)
         prefixo_especial = TICKER_PREFIXO_OPCAO.get(ticker_upper, "")
+        prefixo_esperado = prefixo_especial or ticker_base4
 
-        # Se o ticker termina em número, exige os 5 chars para evitar
-        # confusão entre PETR3 e PETR4, BBAS3 e BBAS, etc.
-        if ticker_upper[-1:].isdigit() and len(ticker_upper) >= 5:
-            match = codigo_opcao.startswith(ticker_base5)
-        else:
-            match = (codigo_opcao.startswith(ticker_base5) or
-                     codigo_opcao.startswith(ticker_base4))
-
-        if prefixo_especial:
-            match = match or codigo_opcao.startswith(prefixo_especial)
+        # IMPORTANTE: os códigos de opção da B3 usam a raiz de 4 letras da
+        # ação, SEM o dígito da classe (ex: PETR4 -> opção "PETRJ437", não
+        # "PETR4...").  Exigir o dígito (5 chars) nunca bate com nenhum
+        # código real e é o motivo de "Nenhuma opção encontrada" aparecer
+        # mesmo para ações muito líquidas como PETR4, ITUB4, ABEV3 etc.
+        match = codigo_opcao.startswith(prefixo_esperado)
         if not match:
             continue
 
