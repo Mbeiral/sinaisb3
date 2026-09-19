@@ -62,7 +62,7 @@ AV_API_KEY    = "RLTAZUQ4OM5F99Y2"     # Obtenha grátis em alphavantage.co/supp
 # Top 15 ações mais líquidas da B3
 # 15 ações = ~3 min na primeira execução, segundos nas seguintes (cache)
 ACOES_B3 = [
-    "PETR4.SAO",    # Petrobras       — maior volume da B3
+    "PETR3.SAO",    # Petrobras (ON) — maior volume da B3; opções (raiz "PETR") são de PETR3
     "VALE3.SAO",    # Vale            — segunda maior
     "ITUB4.SAO",    # Itaú Unibanco   — maior banco
     "BBDC4.SAO",    # Bradesco
@@ -479,8 +479,6 @@ def buscar_opcoes_b3(ticker: str, direcao: str, preco_acao: float) -> dict | Non
             continue
 
         # Verifica se é opção do ticker buscado
-        # Para tickers com número no final (ex: PETR4, BBDC4), exige match
-        # exato nos 5 chars para evitar conflitos (PETR3 vs PETR4)
         codigo_opcao = linha[12:24].strip()
         ticker_base4 = ticker_upper[:4]  # raiz real das opções na B3 (ex: PETR, ABEV, BBDC)
         prefixo_especial = TICKER_PREFIXO_OPCAO.get(ticker_upper, "")
@@ -620,6 +618,15 @@ def processar_acao(ticker: str) -> dict | None:
     preco_atual  = round(float(closes.iloc[-1]), 2)
     preco_ant    = round(float(closes.iloc[-2]), 2)
     variacao_dia = round(((preco_atual / preco_ant) - 1) * 100, 2)
+
+    # Diagnóstico: mostra quais datas de pregão a Alpha Vantage retornou
+    # como "último" e "penúltimo" fechamento — ajuda a identificar quando
+    # a AV está atrasada para algum ticker específico (dado desatualizado
+    # faz a variação % não bater com o Profit ou outra fonte em tempo real)
+    data_atual_str = closes.index[-1].strftime("%d/%m/%Y")
+    data_ant_str   = closes.index[-2].strftime("%d/%m/%Y")
+    print(f"\n    [Diagnóstico Var%] {data_ant_str} (R$ {preco_ant}) → "
+          f"{data_atual_str} (R$ {preco_atual}) = {variacao_dia}%")
 
     score = calcular_score_compra(
         rsi, macd_h, macd_h_ant, bb_pos, vol["variacao"]
