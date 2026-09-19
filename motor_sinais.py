@@ -63,7 +63,11 @@ AV_API_KEY    = "RLTAZUQ4OM5F99Y2"     # Obtenha grátis em alphavantage.co/supp
 # Top 15 ações mais líquidas da B3
 # 15 ações = ~3 min na primeira execução, segundos nas seguintes (cache)
 ACOES_B3 = [
-    "PETR3.SAO",    # Petrobras (ON) — maior volume da B3; opções (raiz "PETR") são de PETR3
+    "PETR4.SAO",    # Petrobras (PN) — maior volume da B3. Mantido em PETR4 (não PETR3)
+                    # porque a B3 usa a MESMA raiz de código "PETR" para opções de
+                    # PETR3 e PETR4 — não dá pra distinguir as duas classes pelo
+                    # código da opção no COTAHIST, então usar sempre PETR4 (a classe
+                    # historicamente mais líquida) evita misturar sinais das duas ações.
     "VALE3.SAO",    # Vale            — segunda maior
     "ITUB4.SAO",    # Itaú Unibanco   — maior banco
     "BBDC4.SAO",    # Bradesco
